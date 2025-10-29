@@ -116,11 +116,46 @@
             grid-gap: 5px;
             max-width: 350px;
         }
-        .tile { width: 100%; display: inline-flex; justify-content: center; align-items: center; font-size: 2.25rem; line-height: 1; font-weight: 800; vertical-align: middle; box-sizing: border-box; color: #fff; text-transform: uppercase; user-select: none; border: 2px solid #374151; border-radius: 8px; background-color: #111827; transition: transform 0.6s, background-color 0.3s, border-color 0.3s; transform-style: preserve-3d; }
-        .tile::before { content: ''; display: inline-block; padding-bottom: 100%; }
+        .tile { 
+            position: relative; /* [DITAMBAH] Ini adalah jangkar untuk .front/.back */
+            width: 100%; 
+            /* [DIHAPUS] Properti flex ini tidak memengaruhi anak 'absolute' */
+            /* display: inline-flex; */
+            /* justify-content: center; */
+            /* align-items: center; */
+            font-size: 1.8rem; /* [DIUBAH] Sedikit lebih kecil dari 2rem */
+            line-height: 1; 
+            font-weight: 800; 
+            vertical-align: middle; 
+            box-sizing: border-box; 
+            color: #fff; 
+            text-transform: uppercase; 
+            user-select: none; 
+            border: 2px solid #374151; 
+            border-radius: 8px; 
+            background-color: #111827; 
+            transition: transform 0.3s, background-color 0.3s, border-color 0.3s; 
+            transform-style: preserve-3d; 
+            aspect-ratio: 1 / 1; 
+        } 
+        .tile::before { display: none; } /* [DIUBAH] Hack padding-bottom dinonaktifkan */
         .tile.filled { border-color: #4b5563; }
         .tile.flip { transform: rotateX(180deg); }
-        .tile .front, .tile .back { position: absolute; backface-visibility: hidden; z-index: 2; transform: rotateX(0deg); }
+        .tile .front, .tile .back { 
+            position: absolute; 
+            backface-visibility: hidden; 
+            z-index: 2; 
+            transform: rotateX(0deg); 
+            
+            /* [BARU] Ini cara yang benar untuk memusatkan huruf di dalam ubin */
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            top: 0;
+            left: 0;
+        }
         .tile .back { transform: rotateX(180deg); }
         .tile.correct { background-color: #10b981; border-color: #10b981; }
         .tile.present { background-color: #f59e0b; border-color: #f59e0b; }
@@ -278,6 +313,44 @@
             display: flex;
             flex-direction: column;
         }
+
+        /* [BARU] CSS untuk Animasi Pemenang */
+        @keyframes celebrationFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes celebrationPopIn {
+            0% { transform: scale(0.7) translateY(20px); opacity: 0; }
+            80% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        #winnerCelebrationOverlay {
+            display: none; /* Diubah oleh JS ke flex */
+            opacity: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            /* Efek spotlight */
+            background-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.8) 100%);
+        }
+
+        #winnerCelebrationOverlay.visible {
+            display: flex;
+            animation: celebrationFadeIn 0.3s ease-out forwards;
+        }
+
+        #winnerCelebrationCard {
+            opacity: 0; /* Mulai transparan */
+            transform: scale(0.7);
+            will-change: transform, opacity;
+            background: linear-gradient(145deg, #1f2937, #374151);
+            border-width: 2px;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1), 0 0 30px 0px rgba(6, 182, 212, 0.4);
+        }
+
+        #winnerCelebrationOverlay.visible #winnerCelebrationCard {
+            /* Memicu animasi pop-in */
+            animation: celebrationPopIn 0.5s cubic-bezier(0.21, 1.02, 0.73, 1) 0.1s forwards;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200 flex items-center justify-center min-h-screen p-4">
@@ -297,14 +370,8 @@
         <!-- Kotak Koneksi (Tetap Sama) -->
         <div class="bg-gray-900/50 p-6 rounded-xl border border-gray-700/50">
             <div class="space-y-4">
-                <div>
-                    <label for="uniqueIdInput" class="block text-sm font-medium text-gray-300 mb-2 text-center"><b>@username</b> TikTok yang sedang LIVE:</label>
-                    <input type="text" id="uniqueIdInput" placeholder="@username" class="flex-grow w-full bg-gray-700 text-white placeholder-gray-400 border-2 border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-300 outline-none shadow-inner">
-                </div>
-                <div>
-                    <label for="sessionIdInput" class="block text-sm font-medium text-gray-300 mb-2 text-center">Session ID (Jika Diperlukan):</label>
-                    <input type="text" id="sessionIdInput" placeholder="Opsional, misal: 8d...0a" class="flex-grow w-full bg-gray-700 text-white placeholder-gray-400 border-2 border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-300 outline-none shadow-inner">
-                </div>
+                <!-- [DIHAPUS] Input Username TikTok -->
+                <!-- [DIHAPUS] Input Session ID -->
                 <button id="connectButton" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-cyan-500 shadow-lg shadow-cyan-500/20">
                     Hubungkan
                 </button>
@@ -431,6 +498,23 @@
         </div>
     </div>
 
+    <!-- [BARU] Overlay Perayaan Pemenang -->
+    <div id="winnerCelebrationOverlay" class="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div id="winnerCelebrationCard" class="w-full max-w-md rounded-2xl border-cyan-400 p-8 text-center">
+            <p id="celebration-title" class="text-3xl font-bold text-yellow-400 uppercase tracking-wider">BERHASIL!</p>
+            <img id="celebration-pfp" src="https://placehold.co/128x128/374151/9ca3af?text=?" 
+                 class="w-32 h-32 rounded-full border-4 border-yellow-400 mx-auto my-6 shadow-lg" 
+                 onerror="this.src='https://placehold.co/128x128/374151/9ca3af?text=?';">
+            <h2 id="celebration-name" class="text-4xl font-extrabold text-white break-words">
+                Nickname Penebak
+            </h2>
+            <p id="celebration-rank" class="text-xl font-medium text-cyan-300 mt-3">
+                Pemenang ke-1
+            </p>
+        </div>
+    </div>
+
+
     <!-- Script Module -->
     <script type="module">
         // Import fungsi Firebase
@@ -470,59 +554,8 @@
 
         signInAnonymously(auth).catch((error) => console.error("Anonymous sign-in failed:", error));
 
-        // ... (TikTokIOConnection Class) ...
-        class TikTokIOConnection {
-            constructor(backendUrl) {
-                this.socket = io(backendUrl);
-                this.uniqueId = null;
-                this.options = null;
-
-                this.socket.on('connect', () => {
-                    console.info("Socket.IO terhubung!");
-                    if (this.uniqueId) {
-                        this.setUniqueId();
-                    }
-                })
-
-                this.socket.on('disconnect', () => {
-                    console.warn("Socket.IO terputus!");
-                })
-
-                this.socket.on('streamEnd', () => {
-                    console.warn("LIVE telah berakhir!");
-                    this.uniqueId = null;
-                })
-
-                this.socket.on('tiktokDisconnected', (errMsg) => {
-                    console.warn(errMsg);
-                    if (errMsg && errMsg.includes('LIVE has ended')) {
-                        this.uniqueId = null;
-                    }
-                });
-            }
-
-            connect(uniqueId, options) {
-                this.uniqueId = uniqueId;
-                this.options = options || {};
-                this.setUniqueId();
-                return new Promise((resolve, reject) => {
-                    this.socket.once('tiktokConnected', resolve);
-                    this.socket.once('tiktokDisconnected', reject);
-                    setTimeout(() => {
-                        reject('Koneksi Timeout');
-                    }, 15000)
-                })
-            }
-
-            // [PERBAIKAN] Mengembalikan fungsi yang hilang
-            setUniqueId() {
-                this.socket.emit('setUniqueId', this.uniqueId, this.options);
-            }
-
-            on(eventName, eventHandler) {
-                this.socket.on(eventName, eventHandler);
-            }
-        }
+        // [DIHAPUS] Kelas TikTokIOConnection tidak lagi diperlukan
+        // class TikTokIOConnection { ... }
 
         /**
          * ===============================================
@@ -530,8 +563,9 @@
          * ===============================================
          */
          
-        let backendUrl = "https://tiktok-server-production-e573.up.railway.app";
-        let connection = new TikTokIOConnection(backendUrl);
+        // [DIUBAH] Ganti URL ini dengan URL server backend Tikfinity Anda
+        let backendUrl = "http://localhost:3000"; // CONTOH: "https://server-game-anda.com"
+        let connection = io(backendUrl, { autoConnect: false }); // Jangan hubungkan otomatis
 
         let viewerCount = 0;
         let likeCount = 0;
@@ -548,8 +582,16 @@
                 return; 
             } 
 
-            $('#connectButton').click(connect);
-            $('#uniqueIdInput').on('keyup', function (e) { if (e.key === 'Enter') { connect(); } });
+            // [DIHAPUS] Logika memuat session ID dari localStorage
+
+            // [DIUBAH] Ganti fungsi tombol connect untuk server baru
+            $('#connectButton').text('Hubungkan ke Server Game').click(function() {
+                $('#stateText').text('Menghubungkan ke server...').removeClass('connected');
+                connection.connect();
+            });
+            
+            // [DIHAPUS] Event listener untuk 'uniqueIdInput'
+
             initializeWordle();
             $('#closeModalButton').on('click', () => $('#infoModal').addClass('hidden'));
             
@@ -581,38 +623,18 @@
             displayLeaderboard(); 
         });
 
-        function connect() {
-            let uniqueId = (window.settings.username || $('#uniqueIdInput').val()).replace(/^@/, '');
-            let sessionId = $('#sessionIdInput').val().trim(); 
-            
-            if (uniqueId !== '') {
-                $('#stateText').text('Menghubungkan...').removeClass('connected'); // Hapus kelas
+        // [BARU] Listener untuk koneksi ke server backend (Tikfinity)
+        connection.on('connect', () => {
+            $('#stateText').text('Terhubung ke Server Tikfinity! Menunggu data LIVE...').addClass('connected');
+            // Anda bisa memulai game di sini jika mau, atau menunggu event dari server
+            startNewGame(); 
+        });
 
-                let connectionOptions = {
-                    enableExtendedGiftInfo: true
-                };
+        connection.on('disconnect', () => {
+            $('#stateText').text('Koneksi ke Server Tikfinity terputus.').removeClass('connected');
+        });
 
-                if (sessionId) {
-                    connectionOptions.sessionId = sessionId;
-                    // [BARU] Coba paksa request polling jika session ID diberikan
-                    // Ini untuk mengatasi error "websocket upgrade"
-                    connectionOptions.forceRequestPolling = true; 
-                    console.log("Mencoba koneksi dengan Session ID (memaksa polling):", sessionId);
-                }
-
-                connection.connect(uniqueId, connectionOptions).then(state => {
-                    $('#stateText').text(`Terhubung ke roomId ${state.roomId}`).addClass('connected'); // Tambahkan kelas
-                    viewerCount = 0; likeCount = 0; diamondsCount = 0;
-                    updateRoomStats();
-                    
-                    startNewGame();
-                }).catch(errorMessage => {
-                    $('#stateText').text(errorMessage).removeClass('connected'); // Hapus kelas
-                })
-            } else {
-                showModal('Error', '<p>Nama pengguna tidak boleh kosong!</p>');
-            }
-        }
+        // [DIHAPUS] Fungsi connect() yang lama tidak diperlukan lagi
         
         // ... (sanitize, updateRoomStats, generateUsernameLink, isPendingStreak, addChatItem) ...
         function sanitize(text) { return text.replace(/</g, '&lt;') }
@@ -642,36 +664,96 @@
         }
         
         // ... (Event listener koneksi TikTok: roomUser, like, member, chat, social, streamEnd) ...
-        connection.on('roomUser', (msg) => { if (typeof msg.viewerCount === 'number') { viewerCount = msg.viewerCount; updateRoomStats(); } })
-        connection.on('like', (msg) => { if (typeof msg.totalLikeCount === 'number') { likeCount = msg.totalLikeCount; updateRoomStats(); } if (typeof msg.likeCount === 'number' && msg.label) { addChatItem('#ec4899', msg, msg.label.replace('{0:user}', '').replace('likes', `${msg.likeCount} suka`)) } })
-        connection.on('member', (msg) => {
-            let addDelay = 250; if (joinMsgDelay > 500) addDelay = 100; if (joinMsgDelay > 1000) addDelay = 0;
-            joinMsgDelay += addDelay;
-            setTimeout(() => { joinMsgDelay -= addDelay; addChatItem('#2dd4bf', msg, 'bergabung', true); }, joinMsgDelay);
-        })
-        connection.on('chat', (msg) => {
-            addChatItem('', msg, msg.comment);
-            
-            const rawComment = msg.comment.trim(); 
+        
+        // [DIUBAH] Listener lama dihapus dan diganti dengan listener untuk 'tiktokBatch'
+        
+        // Listener untuk event "tiktokBatch" dari server.js Anda
+        connection.on('tiktokBatch', (batch) => {
+            if (!Array.isArray(batch)) return; // Pastikan data adalah array
 
-            if (rawComment === '!win') {
-                showUserWinStatus(msg.userId, msg.nickname, msg.profilePictureUrl);
-                return; 
-            }
+            batch.forEach(event => {
+                
+                // Siapkan data pengguna universal
+                const userData = {
+                    userId: event.user || event.userId || event.uniqueId,
+                    nickname: event.nickname,
+                    profilePictureUrl: event.pfp || event.profilePictureUrl
+                };
 
-            const emojiRegex = /(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g;
-            const cleanedComment = rawComment.replace(emojiRegex, '');
-            const potentialGuess = cleanedComment.trim().toUpperCase();
+                // Server Anda mengirim { type: "guess", ... }
+                if (event.type === 'guess') {
+                    const guessData = event.guess; // "WORDL"
 
-            if (potentialGuess.length === WORD_LENGTH && /^[A-Z]+$/.test(potentialGuess)) {
-                guessQueue.push({ guess: potentialGuess, user: msg, isManual: false });
-                processGuessQueue(); 
-            }
-        })
-        connection.on('social', (data) => { if (!data.label) return; let color = data.displayType.includes('follow') ? '#f43f5e' : '#2fb816'; addChatItem(color, data, data.label.replace('{0:user}', '')); })
-        connection.on('streamEnd', () => { 
-            $('#stateText').text('Stream berakhir.').removeClass('connected'); // Hapus kelas
-        })
+                    // Server Anda sudah memfilter 5 huruf, jadi kita bisa langsung menambahkannya
+                    guessQueue.push({ 
+                        guess: guessData, 
+                        user: userData, 
+                        isManual: false 
+                    });
+                    processGuessQueue(); 
+                
+                } else if (event.type === 'chat') {
+                    // [BARU] Menangani obrolan biasa
+                    addChatItem('', userData, event.text);
+
+                } else if (event.type === 'winCheck') {
+                    // [BARU] Menangani perintah !win
+                    showUserWinStatus(userData.userId, userData.nickname, userData.profilePictureUrl);
+
+                } else if (event.type === 'like') {
+                    // [BARU] Menangani like
+                    if (typeof event.totalLikeCount === 'number') {
+                        likeCount = event.totalLikeCount;
+                        updateRoomStats();
+                    }
+                    if (event.likeCount > 0) {
+                        addChatItem('#ec4899', event, `${event.likeCount} suka`);
+                    }
+
+                } else if (event.type === 'member') {
+                    // [BARU] Menangani member baru
+                    addChatItem('#2dd4bf', event, 'bergabung', true);
+
+                } else if (event.type === 'roomUser') {
+                    // [BARU] Menangani update viewer
+                    if (typeof event.viewerCount === 'number') {
+                        viewerCount = event.viewerCount;
+                        updateRoomStats();
+                    }
+                
+                } else if (event.type === 'social') {
+                    // [BARU] Menangani follow/share
+                    if (event.label) {
+                        let color = event.displayType.includes('follow') ? '#f43f5e' : '#2fb816';
+                        addChatItem(color, event, event.label.replace('{0:user}', ''));
+                    }
+                }
+                
+                // [DIHAPUS] Menangani perintah !next
+                /*
+                else if (event.type === 'nextGame') {
+                    if (isWaitingForNextGame) {
+                        console.log("!next command received during definition. Proceeding.");
+                        // Optional: Tampilkan di chat siapa yang memulai
+                        // addChatItem('#f59e0b', userData, 'memulai ronde berikutnya...');
+                        proceedToNextGame();
+                    }
+                }
+                */
+                
+                // CATATAN: Event lain seperti 'chat' biasa, 'like', 'follow',
+                // dan 'roomUser' tidak ditangani di sini karena server.js Anda
+                // tidak mengirimkannya.
+            });
+        });
+        
+        // [DIHAPUS] Semua listener lama (roomUser, like, member, chat, social, streamEnd)
+        // connection.on('roomUser', (msg) => { ... })
+        // connection.on('like', (msg) => { ... })
+        // connection.on('member', (msg) => { ... })
+        // connection.on('chat', (msg) => { ... })
+        // connection.on('social', (data) => { ... })
+        // connection.on('streamEnd', () => { ... })
 
 
         /**
@@ -700,6 +782,7 @@
         let userGuessCount = {}; // { userId: count }
         
         let winnerListThisRound = []; 
+        let isWaitingForNextGame = false; // [BARU] Status untuk jeda definisi
 
         const controlRef = doc(db, "gameControl", "liveState");
         let isGamePaused = false;
@@ -729,8 +812,15 @@
 
                 if (data.forceSkip > lastSkipTime) {
                     lastSkipTime = data.forceSkip;
-                    if (!isProcessingGuess && !isGameOver) { 
-                        console.log("Admin skip detected. Triggering end game sequence.");
+                    
+                    // [DIUBAH] forceSkip sekarang bisa 2 fungsi:
+                    // 1. Lewati game yang sedang berjalan
+                    // 2. Lanjutkan dari layar definisi
+                    if (isWaitingForNextGame) {
+                        console.log("Admin skip detected during definition. Proceeding to next game.");
+                        proceedToNextGame();
+                    } else if (!isProcessingGuess && !isGameOver) { 
+                        console.log("Admin skip detected during active game. Triggering end game sequence.");
                         triggerEndGameSequence();
                     }
                 }
@@ -755,7 +845,8 @@
                 }
             });
         }
-
+        
+        // [BARU] FUNGSI DIKEMBALIKAN
         function updateTimer() {
             if (isGameOver) {
                 clearInterval(countdownTimer);
@@ -776,6 +867,7 @@
             }
         }
         
+        // [BARU] FUNGSI DIKEMBALIKAN
         function updateBestGuessUI(bestGuessData) {
             const container = $('#best-guess-container');
             container.empty();
@@ -786,6 +878,7 @@
             container.html(tilesHtml);
         }
 
+        // [BARU] FUNGSI DIKEMBALIKAN
         function initializeWordle() {
             containerElement = $('#wordle-container');
             $('#newGameButton').on('click', startNewGame);
@@ -793,6 +886,7 @@
             $('#wordle-message').html('Hubungkan ke LIVE untuk memulai...');
         }
         
+        // [BARU] FUNGSI DIKEMBALIKAN
         function showModal(title, content, autoCloseDelay = null) {
             $('#modalTitle').text(title);
             $('#modalContent').html(content);
@@ -805,6 +899,7 @@
             }
         }
 
+        // [BARU] FUNGSI DIKEMBALIKAN
         function showValidationToast(content) {
             clearTimeout(validationToastTimeout);
             const toast = $('#validationToast');
@@ -816,6 +911,7 @@
             processGuessQueue(); 
         }
         
+        // [BARU] FUNGSI DIKEMBALIKAN
         async function fetchRandomWordFromFirebase(length) {
             if (wordCache[length] && wordCache[length].length > 0) {
                 return wordCache[length][Math.floor(Math.random() * wordCache[length].length)];
@@ -834,6 +930,7 @@
             }
         }
         
+        // [BARU] FUNGSI DIKEMBALIKAN
         async function validateWordWithFirebase(word) {
             try {
                 const wordRef = doc(db, "words", word.toUpperCase());
@@ -845,6 +942,7 @@
             }
         }
 
+        // [BARU] FUNGSI DIKEMBALIKAN
         async function startNewGame() {
             if (isProcessingGuess) return;
             if (!db) {
@@ -906,6 +1004,7 @@
             processGuessQueue(); 
         }
 
+        // [BARU] FUNGSI DIKEMBALIKAN
         async function triggerEndGameSequence() {
             if (isGameOver) return; 
             
@@ -913,71 +1012,43 @@
             clearInterval(countdownTimer);
             console.log("Triggering End Game Sequence...");
 
-            // 1. Tampilkan Modal Pemenang (jika ada)
-            if (winnerListThisRound.length > 0) {
-                let winnerModalContent = `<p class="text-lg">Kata yang benar adalah: <b class="text-cyan-400 text-2xl font-bold">${targetWord}</b></p>`;
-                winnerModalContent += '<div class="space-y-3 mt-4 text-left">';
-
-                const truncate = (str, n) => (str.length > n ? str.substr(0, n - 1) + '...' : str);
-
-                const winner1 = winnerListThisRound[0];
-                winnerModalContent += `
-                    <div class="flex items-center gap-3 bg-gray-700/50 p-3 rounded-lg border border-yellow-500">
-                        <span class="font-bold text-yellow-400 text-lg w-8">#1</span>
-                        <img src="${winner1.pfp}" class="w-12 h-12 rounded-full" onerror="this.src='https://placehold.co/48x48/374151/9ca3af?text=?';">
-                        <div class="flex-1 overflow-hidden">
-                            <p class="font-semibold text-white truncate">${sanitize(truncate(winner1.nickname, 15))}</p>
-                            <p class="font-bold text-green-400 text-sm">${winner1.points} Poin</p>
-                        </div>
-                    </div>
-                `;
-
-                if (winnerListThisRound.length > 1) {
-                    const winner2 = winnerListThisRound[1];
-                    winnerModalContent += `
-                        <div class="flex items-center gap-3 bg-gray-700/50 p-2 rounded-lg border border-gray-600">
-                            <span class="font-bold text-gray-300 text-md w-8">#2</span>
-                            <div class="flex-1 overflow-hidden">
-                                <p class="font-semibold text-white truncate">${sanitize(truncate(winner2.nickname, 18))}</p>
-                                <p class="font-bold text-green-400 text-sm">${winner2.points} Poin</p>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                if (winnerListThisRound.length > 2) {
-                    const winner3 = winnerListThisRound[2];
-                    winnerModalContent += `
-                        <div class="flex items-center gap-3 bg-gray-700/50 p-2 rounded-lg border border-gray-600">
-                            <span class="font-bold text-orange-400 text-md w-8">#3</span>
-                            <div class="flex-1 overflow-hidden">
-                                <p class="font-semibold text-white truncate">${sanitize(truncate(winner3.nickname, 18))}</p>
-                                <p class="font-bold text-green-400 text-sm">${winner3.points} Poin</p>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                winnerModalContent += '</div>';
-                showModal("PEMENANG RONDE INI!", winnerModalContent);
-                
-                await new Promise(resolve => setTimeout(resolve, 5000));
-
-            } else {
+            // [DIUBAH] Logika modal pemenang/kalah dihapus.
+            // Notifikasi pemenang pertama ditangani oleh showWinnerCelebration.
+            // Notifikasi Waktu Habis (jika tidak ada pemenang) ditambahkan.
+            if (winnerListThisRound.length === 0) {
+                 // Hanya tampilkan "WAKTU HABIS" jika tidak ada pemenang
                 let content = `<p class="text-lg">WAKTU HABIS! Tidak ada pemenang.</p>`;
                 content += `<p class="text-lg mt-2">Kata yang benar adalah: <b class="text-cyan-400 text-2xl font-bold">${targetWord}</b></p>`;
                 showModal("WAKTU HABIS!", content);
                 
+                // Jeda 5 detik untuk modal Waktu Habis
                 await new Promise(resolve => setTimeout(resolve, 5000));
             }
+            
+            $('#infoModal').addClass('hidden'); // Sembunyikan modal (baik Waktu Habis atau modal sebelumnya)
 
             // 2. Tampilkan Modal Definisi
             const definitionTitle = `Definisi: ${targetWord}`;
-            const definitionContent = `<div class="text-left"><p class="text-base text-gray-200">${targetWordDefinition || 'Definisi tidak tersedia.'}</div></div>`;
+            // [DIUBAH] Hapus instruksi !next
+            let definitionContent = `<div class="text-left"><p class="text-base text-gray-200">${targetWordDefinition || 'Definisi tidak tersedia.'}</p></div>`;
+            // [DIHAPUS] Instruksi !next
+            // definitionContent += `<p class="text-center text-cyan-300 font-medium mt-4 text-sm">Ketik <b class="text-white">!next</b> di chat atau tunggu Host<br>untuk memulai ronde berikutnya.</p>`;
+            
             showModal(definitionTitle, definitionContent);
             
-            await new Promise(resolve => setTimeout(resolve, 5000));
+            // [BARU] Set status jeda (untuk tombol admin)
+            isWaitingForNextGame = true;
 
+            // [BARU] Jeda 10 detik lalu lanjut otomatis
+            setTimeout(proceedToNextGame, 10000); 
+        }
+
+        // [BARU] FUNGSI DIKEMBALIKAN
+        async function proceedToNextGame() {
+            if (!isWaitingForNextGame) return; // Hindari trigger ganda
+            
+            isWaitingForNextGame = false;
+            
             $('#infoModal').addClass('hidden');
             
             // 3. Tampilkan Overlay Peringkat
@@ -993,6 +1064,7 @@
             setTimeout(startNewGame, 1000);
         }
 
+        // [BARU] FUNGSI DIKEMBALIKAN
         async function updateGlobalScore(userId, nickname, pfp, pointsToAdd) {
             if (!userId || userId === 'admin_manual') return; 
             
@@ -1023,6 +1095,7 @@
             }
         }
         
+        // [BARU] FUNGSI DIKEMBALIKAN
         function displayLeaderboard() {
             const leaderboardContainer = $('#leaderboard-container');
             const q = query(
@@ -1062,6 +1135,7 @@
             });
         }
 
+        // [BARU] FUNGSI DIKEMBALIKAN
         function processGuessQueue() {
             if (isGamePaused || isGameOver || isProcessingGuess || guessQueue.length === 0) {
                 return;
@@ -1071,6 +1145,35 @@
             const nextGuessData = guessQueue.shift();
             
             handleGuess(nextGuessData.guess, nextGuessData.user, nextGuessData.isManual);
+        }
+
+        // [BARU] Fungsi untuk menampilkan overlay perayaan
+        function showWinnerCelebration(user, rankText) {
+            // Mengembalikan Promise agar kita bisa menunggu animasinya selesai
+            return new Promise(resolve => {
+                const overlay = $('#winnerCelebrationOverlay');
+                const card = $('#winnerCelebrationCard');
+
+                // 1. Reset
+                overlay.removeClass('visible');
+                
+                // 2. Isi konten
+                overlay.find('#celebration-pfp')
+                       .attr('src', user.profilePictureUrl || 'https://placehold.co/128x128/374151/9ca3af?text=?')
+                       .on('error', function() { this.src='https://placehold.co/128x128/374151/9ca3af?text=?'; });
+                overlay.find('#celebration-name').text(user.nickname);
+                overlay.find('#celebration-rank').text(rankText);
+                
+                // 3. Tampilkan overlay dan picu animasi
+                overlay.addClass('visible');
+
+                // 4. Sembunyikan setelah 4 detik
+                setTimeout(() => {
+                    overlay.removeClass('visible');
+                    // Selesaikan promise SETELAH animasi fade-out selesai
+                    setTimeout(resolve, 300); // 300ms = durasi 'celebrationFadeIn'
+                }, 4000); // Tampilkan selama 4 detik
+            });
         }
 
         async function handleGuess(guess, userData, isManualGuess = false) {
@@ -1153,7 +1256,7 @@
             }
 
             for (let i = 0; i < WORD_LENGTH; i++) {
-                await new Promise(resolve => setTimeout(resolve, 250)); 
+                await new Promise(resolve => setTimeout(resolve, 100)); /* [DIUBAH] 250 -> 100 */
                 const tile = $(currentTiles[i]);
                 tile.addClass('flip').find('.back').parent().addClass(letterClasses[i]);
             }
@@ -1168,18 +1271,25 @@
                     const winnerRank = winnerListThisRound.length + 1;
                     let pointsToAdd = 0;
                     let rankText = "";
+                    let celebrationText = ""; // [BARU] Teks untuk overlay
 
+                    // [DIUBAH] Hanya pemenang 1 yang dapat poin
                     if (winnerRank === 1) {
                         pointsToAdd = 3;
                         rankText = "Pemenang ke-1 (+3 Poin)";
+                        celebrationText = "TEBAKAN TEPAT!"; // [DIUBAH] Teks perayaan lebih simpel
                     } else if (winnerRank === 2) {
-                        pointsToAdd = 2;
-                        rankText = "Pemenang ke-2 (+2 Poin)";
+                        pointsToAdd = 0; // [DIUBAH]
+                        rankText = "Pemenang ke-2 (0 Poin)"; // [DIUBAH]
+                        celebrationText = "Tebakan Tepat!"; // [BARU]
                     } else if (winnerRank === 3) {
-                        pointsToAdd = 1;
-                        rankText = "Pemenang ke-3 (+1 Poin)";
+                        pointsToAdd = 0; // [DIUBAH]
+                        rankText = "Pemenang ke-3 (0 Poin)"; // [DIUBAH]
+                        celebrationText = "Tebakan Tepat!"; // [BARU]
                     } else {
+                        pointsToAdd = 0;
                         rankText = `Pemenang ke-${winnerRank} (0 Poin)`;
+                        celebrationText = "Tebakan Tepat!"; // [BARU]
                     }
 
                     winnerListThisRound.push({
@@ -1193,7 +1303,11 @@
                         updateGlobalScore(userId, userData.nickname, userData.profilePictureUrl, pointsToAdd);
                     }
                     
-                    showValidationToast(`<b>${sanitize(userData.nickname)}</b> adalah <b>${rankText}</b>!`);
+                    // [DIUBAH] Tampilkan perayaan, BUKAN toast
+                    // showValidationToast(`<b>${sanitize(userData.nickname)}</b> adalah <b>${rankText}</b>!`);
+                    
+                    isProcessingGuess = true; // Jeda antrian selagi perayaan
+                    await showWinnerCelebration(userData, celebrationText); // [DIUBAH] Menggunakan celebrationText
 
                     // [PERUBAHAN] Jika ini pemenang PERTAMA, hentikan permainan
                     if (winnerRank === 1) {
@@ -1206,7 +1320,10 @@
                     processGuessQueue(); 
 
                 } else if (isManualGuess) {
-                    showValidationToast(`Tebakan Manual <b>${guess}</b> oleh <b>${sanitize(userData.nickname)}</b> berhasil.`);
+                    // [DIUBAH] Tampilkan perayaan untuk tebakan manual
+                    isProcessingGuess = true; // Jeda antrian selagi perayaan
+                    await showWinnerCelebration(userData, "Tebakan Manual Berhasil!");
+
                     if (!winnerListThisRound.find(w => w.isManual && w.nickname === userData.nickname)) {
                         winnerListThisRound.push({
                             userId: 'admin_manual',
@@ -1218,7 +1335,7 @@
                     }
                     
                     console.log("Manual guess winner. Triggering end game sequence.");
-                    triggerEndGameSequence();
+                    triggerEndGLogicameSequence();
                     return; 
                 }
                 
@@ -1314,5 +1431,3 @@
     </script>
 </body>
 </html>
-
-
