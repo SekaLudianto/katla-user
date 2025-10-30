@@ -68,10 +68,10 @@
         /* ... (Styling wordle-row-container dan tile tetap sama) ... */
         .wordle-row-container {
             display: grid;
-            /* [DIUBAH] Layout mobile-first yang lebih sempit */
-            grid-template-columns: 40px 1fr 50px; 
+            /* [DIUBAH] Layout mobile-first yang lebih sempit + gap lebih kecil */
+            grid-template-columns: 32px 1fr 40px; 
             align-items: center;
-            gap: 8px; /* [DIUBAH] Kurangi gap */
+            gap: 4px; /* [DIUBAH] Kurangi gap */
             margin-bottom: 8px;
             max-width: 500px;
             margin-left: auto;
@@ -79,7 +79,7 @@
         }
         .guesser-pfp {
              /* [DIUBAH] Ukuran PFP mobile-first */
-            width: 40px; height: 40px;
+            width: 32px; height: 32px;
             border-radius: 8px; /* [DIUBAH] */
             background-color: #374151;
             border: 2px solid #4b5563;
@@ -89,11 +89,19 @@
         .guesser-name {
             font-size: 0.7rem; /* [DIUBAH] Kecilkan font nama */
             font-weight: 600;
-            color: #9ca3af; /* gray-400 */
+            color: #ffffff; /* [DIUBAH] gray-400 -> white */
             line-height: 1.2; /* [DIUBAH] Rapatkan line */
             word-break: break-all;
             text-align: left;
         }
+        /* [BARU] CSS untuk menampilkan inisial/nama lengkap */
+        .guesser-name-initials {
+            display: block; /* Tampilkan inisial di mobile */
+        }
+        .guesser-name-full {
+            display: none; /* Sembunyikan nama lengkap di mobile */
+        }
+
         .guesser-name.manual, .guesser-pfp.manual {
             border-color: #67e8f9; /* Sorot tebakan manual admin */
         }
@@ -263,10 +271,12 @@
         .rank-item.rank-1 .rank-num { color: #f59e0b; }
         .rank-item.rank-2 .rank-num { color: #d1d5db; }
         .rank-item.rank-3 .rank-num { color: #a16207; }
-        .win-status-pfp { width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 12px auto; border: 4px solid #06b6d4; }
-        .win-status-name { font-size: 1.5rem; font-weight: 700; color: #fff; }
-        .win-status-score { font-size: 1.1rem; color: #e5e7eb; margin-top: 4px; }
-        .win-status-rank { font-size: 1.1rem; color: #e5e7eb; }
+
+        /* [DIUBAH] Ukuran overlay !win dikecilkan */
+        .win-status-pfp { width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 12px auto; border: 4px solid #06b6d4; }
+        .win-status-name { font-size: 1.125rem; font-weight: 700; color: #fff; }
+        .win-status-score { font-size: 0.875rem; color: #e5e7eb; margin-top: 4px; }
+        .win-status-rank { font-size: 0.875rem; color: #e5e7eb; }
 
         /* ... (tab button styles) ... */
         .tab-button {
@@ -357,6 +367,14 @@
                 font-size: 0.75rem; /* 12px */
                 line-height: 1.3;
             }
+            /* [BARU] Sembunyikan/tampilkan nama/inisial di desktop */
+            .guesser-name-initials {
+                display: none;
+            }
+            .guesser-name-full {
+                display: block;
+            }
+
             .guesser-chances {
                  font-size: 0.7rem; /* 11px */
             }
@@ -453,7 +471,8 @@
                             Game Baru (Manual)
                         </button>
                     </div>
-                    <p class="text-center text-cyan-300 mb-2 text-sm font-medium">Ketik <b>!win</b> untuk cek poin & peringkatmu. Tebakan 5 huruf akan masuk grid.</p>
+                    <!-- [DIUBAH] Warna font instruksi diubah ke putih -->
+                    <p class="text-center text-white mb-2 text-sm font-medium">Ketik <b>!win</b> untuk cek poin & peringkatmu. Tebakan 5 huruf akan masuk grid.</p>
                     <p class="text-center text-gray-400 text-sm mb-2">Petunjuk (Tebakan Terbaik Sejauh Ini):</p>
                     <div id="best-guess-container" class="min-h-[40px]">
                         <!-- Tebakan terbaik akan muncul di sini -->
@@ -508,7 +527,8 @@
             <!-- Peringkat dimuat di sini -->
         </div>
     </div>
-    <div id="userWinStatusOverlay" class="fixed bottom-5 left-5 bg-gradient-to-br from-gray-800 to-gray-900 bg-opacity-90 backdrop-blur-md text-white p-4 rounded-lg shadow-2xl z-50 transition-all duration-300 hidden border border-cyan-500/50 max-w-xs w-full text-center">
+    <!-- [DIUBAH] Posisi, BG, dan Ukuran Overlay !win -->
+    <div id="userWinStatusOverlay" class="fixed top-5 left-1/2 -translate-x-1/2 bg-black/75 text-white p-3 rounded-lg shadow-2xl z-50 transition-all duration-300 hidden border border-cyan-500/50 max-w-[280px] w-full text-center">
         <h3 class="text-lg font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-500">Status Poin</h3>
         <div id="userWinStatusContent">
             <!-- Status dimuat di sini -->
@@ -679,6 +699,18 @@
         function generateUsernameLink(data) { return `<a class="usernamelink" href="https://www.tiktok.com/@${data.uniqueId}" target="_blank">${data.nickname}</a>`; }
         function isPendingStreak(data) { return data.giftType === 1 && !data.repeatEnd; }
         
+        // [BARU] Fungsi untuk mendapatkan inisial
+        function getInitials(name) {
+            if (!name) return '?';
+            const parts = name.trim().split(/\s+/); // Pisahkan berdasarkan spasi
+            if (parts.length === 1) {
+                // Ambil 2 huruf pertama jika hanya 1 kata
+                return name.substring(0, 2).toUpperCase();
+            }
+            // Ambil huruf pertama dari kata pertama dan kata terakhir
+            return (parts[0][0] + (parts[parts.length - 1][0] || '')).toUpperCase();
+        }
+
         function addChatItem(color, data, text, summarize) {
             let container = window.$('.chatcontainer');
             if (container.find('div').length > 500) { container.find('div').slice(0, 200).remove(); }
@@ -700,13 +732,10 @@
         }
         
         // =================================================================
-        // [PERUBAHAN UTAMA] MENGGANTI 'tiktokBatch' DENGAN LISTENER INDIVIDUAL
+        // [TIDAK DIUBAH] Listener Individual untuk event server
         // =================================================================
         
-        // [DIHAPUS] Listener tiktokBatch
-        // connection.on('tiktokBatch', (batch) => { ... });
-
-        // [BARU] Menangani update viewer dari server.js
+        // [TIDAK DIUBAH] Menangani update viewer dari server.js
         connection.on('roomUser', (msg) => {
             if (typeof msg.viewerCount === 'number') {
                 viewerCount = msg.viewerCount;
@@ -714,13 +743,13 @@
             }
         });
 
-        // [BARU] Menangani member (join) dari server.js
+        // [TIDAK DIUBAH] Menangani member (join) dari server.js
         connection.on('member', (msg) => {
             const userData = { userId: msg.uniqueId, nickname: msg.nickname, profilePictureUrl: msg.profilePictureUrl };
             addChatItem('#2dd4bf', userData, 'bergabung', true);
         });
 
-        // [BARU] Menangani like dari server.js
+        // [TIDAK DIUBAH] Menangani like dari server.js
         connection.on('like', (msg) => {
             if (typeof msg.totalLikeCount === 'number') {
                 likeCount = msg.totalLikeCount;
@@ -732,7 +761,7 @@
             }
         });
 
-        // [BARU] Menangani social (follow/share) dari server.js
+        // [TIDAK DIUBAH] Menangani social (follow/share) dari server.js
         connection.on('social', (msg) => {
             if (msg.label) {
                 const userData = { userId: msg.uniqueId, nickname: msg.nickname, profilePictureUrl: msg.profilePictureUrl };
@@ -741,7 +770,7 @@
             }
         });
 
-        // [BARU] Menangani Chat (Tebakan, !win, obrolan biasa) dari server.js
+        // [TIDAK DIUBAH] Menangani Chat (Tebakan, !win, obrolan biasa) dari server.js
         connection.on('chat', (msg) => {
             const text = (msg.comment || "").trim();
             const textUpper = text.toUpperCase();
@@ -771,20 +800,16 @@
             }
         });
         
-        // [BARU] Listener statistik (opsional, tapi ada di server.js)
+        // [TIDAK DIUBAH] Listener statistik (opsional, tapi ada di server.js)
         connection.on('statistic', (data) => {
             // console.log("Statistik global:", data.globalConnectionCount);
             // Tidak ada UI untuk ini, jadi biarkan saja
         });
         
-        // [DIHAPUS] Semua listener lama (roomUser, like, member, chat, social)
-        // karena sekarang ditangani oleh 'tiktokBatch'
-
-
         /**
          * ===============================================
          * BAGIAN 3: WORDLE (KATLA) GAME LOGIC
-         * [TIDAK ADA PERUBAHAN DI BAWAH INI]
+         * [PERUBAHAN KECIL DI BAWAH INI]
          * ===============================================
          */
         
@@ -808,7 +833,7 @@
         let userGuessCount = {}; // { userId: count }
         
         let winnerListThisRound = []; 
-        let isWaitingForNextGame = false; // [BARU] Status untuk jeda definisi
+        let isWaitingForNextGame = false; 
 
         const controlRef = doc(db, "gameControl", "liveState");
         let isGamePaused = false;
@@ -816,6 +841,7 @@
         let lastManualGuessTime = 0;
         let forcedNextWordData = null;
 
+        // [TIDAK DIUBAH] listenToGameControl
         function listenToGameControl() {
             onSnapshot(controlRef, (docSnap) => {
                 if (!docSnap.exists()) return; 
@@ -869,6 +895,7 @@
             });
         }
         
+        // [TIDAK DIUBAH] updateTimer
         function updateTimer() {
             if (isGameOver) {
                 clearInterval(countdownTimer);
@@ -889,6 +916,7 @@
             }
         }
         
+        // [TIDAK DIUBAH] updateBestGuessUI
         function updateBestGuessUI(bestGuessData) {
             const container = window.$('#best-guess-container');
             container.empty();
@@ -899,6 +927,7 @@
             container.html(tilesHtml);
         }
 
+        // [TIDAK DIUBAH] initializeWordle
         function initializeWordle() {
             containerElement = window.$('#wordle-container');
             window.$('#newGameButton').on('click', startNewGame);
@@ -906,6 +935,7 @@
             window.$('#wordle-message').html('Hubungkan ke LIVE untuk memulai...');
         }
         
+        // [TIDAK DIUBAH] showModal
         function showModal(title, content, autoCloseDelay = null) {
             window.$('#modalTitle').text(title);
             window.$('#modalContent').html(content);
@@ -918,6 +948,7 @@
             }
         }
 
+        // [TIDAK DIUBAH] showValidationToast
         function showValidationToast(content) {
             clearTimeout(validationToastTimeout);
             const toast = window.$('#validationToast');
@@ -929,6 +960,7 @@
             processGuessQueue(); 
         }
         
+        // [TIDAK DIUBAH] fetchRandomWordFromFirebase
         async function fetchRandomWordFromFirebase(length) {
             if (wordCache[length] && wordCache[length].length > 0) {
                 return wordCache[length][Math.floor(Math.random() * wordCache[length].length)];
@@ -947,6 +979,7 @@
             }
         }
         
+        // [TIDAK DIUBAH] validateWordWithFirebase
         async function validateWordWithFirebase(word) {
             try {
                 const wordRef = doc(db, "words", word.toUpperCase());
@@ -958,6 +991,7 @@
             }
         }
 
+        // [TIDAK DIUBAH] startNewGame
         async function startNewGame() {
             if (isProcessingGuess) return;
             if (!db) {
@@ -1019,6 +1053,7 @@
             processGuessQueue(); 
         }
 
+        // [TIDAK DIUBAH] triggerEndGameSequence
         async function triggerEndGameSequence() {
             if (isGameOver) return; 
             
@@ -1049,6 +1084,7 @@
             setTimeout(proceedToNextGame, 10000); 
         }
 
+        // [TIDAK DIUBAH] proceedToNextGame
         async function proceedToNextGame() {
             if (!isWaitingForNextGame) return; // Hindari trigger ganda
             
@@ -1067,6 +1103,7 @@
             setTimeout(startNewGame, 1000);
         }
 
+        // [TIDAK DIUBAH] updateGlobalScore
         async function updateGlobalScore(userId, nickname, pfp, pointsToAdd) {
             if (!userId || userId === 'admin_manual') return; 
             
@@ -1097,6 +1134,7 @@
             }
         }
         
+        // [TIDAK DIUBAH] displayLeaderboard
         function displayLeaderboard() {
             const leaderboardContainer = window.$('#leaderboard-container');
             const q = query(
@@ -1136,6 +1174,7 @@
             });
         }
 
+        // [TIDAK DIUBAH] processGuessQueue
         function processGuessQueue() {
             if (isGamePaused || isGameOver || isProcessingGuess || guessQueue.length === 0) {
                 return;
@@ -1147,6 +1186,7 @@
             handleGuess(nextGuessData.guess, nextGuessData.user, nextGuessData.isManual);
         }
 
+        // [TIDAK DIUBAH] showWinnerCelebration
         function showWinnerCelebration(user, rankText) {
             // Mengembalikan Promise agar kita bisa menunggu animasinya selesai
             return new Promise(resolve => {
@@ -1170,6 +1210,7 @@
             });
         }
 
+        // [DIUBAH] handleGuess untuk Inisial
         async function handleGuess(guess, userData, isManualGuess = false) {
             
             const userId = userData.userId;
@@ -1210,9 +1251,16 @@
                  chancesText = `<span class="guesser-chances">(Sisa: ${chancesLeft})</span>`;
             }
 
+            // [DIUBAH] Logika nameHtml untuk inisial
+            const nickname = sanitize(userData.nickname);
+            const initials = getInitials(nickname);
+
             const nameHtml = `
                 <div class="${isManualGuess ? 'manual' : ''}">
-                    <span class="guesser-name">${sanitize(userData.nickname)}</span>
+                    <span class="guesser-name">
+                        <span class="guesser-name-full">${nickname}</span>
+                        <span class="guesser-name-initials">${initials}</span>
+                    </span>
                     ${chancesText}
                 </div>
             `;
@@ -1334,6 +1382,7 @@
             }
         }
 
+        // [TIDAK DIUBAH] showRankUpdateOverlay
         async function showRankUpdateOverlay() {
             const overlay = window.$('#rankUpdateOverlay');
             const list = overlay.find('#rankUpdateList');
@@ -1373,6 +1422,7 @@
             }
         }
 
+        // [DIUBAH] showUserWinStatus untuk menghapus inline style
         async function showUserWinStatus(userId, nickname, pfp) {
             if (!userId) return;
             const overlay = window.$('#userWinStatusOverlay');
@@ -1398,17 +1448,18 @@
                 const snapshot = await getDocs(q);
                 const rank = snapshot.size + 1;
 
+                // [DIUBAH] Hapus semua inline style="font-size: ..."
                 content.html(`
-                    <img src="${pfp}" class="win-status-pfp" style="font-size: 0.9rem;" onerror="this.src='https://placehold.co/80x80/374151/9ca3af?text=?';">
-                    <h4 class="win-status-name" style="font-size: 1.25rem;">${sanitize(nickname)}</h4>
-                    <p class="win-status-score" style="font-size: 0.9rem;">Total Poin: <b>${userScore}</b></p>
-                    <p class="win-status-score" style="font-size: 0.9rem;">Total Menang (1-3): <b>${userWins}</b></p>
-                    <p class="win-status-rank" style="font-size: 0.9rem;">Peringkat: <b>#${rank}</b></p>
+                    <img src="${pfp}" class="win-status-pfp" onerror="this.src='https://placehold.co/80x80/374151/9ca3af?text=?';">
+                    <h4 class="win-status-name">${sanitize(nickname)}</h4>
+                    <p class="win-status-score">Total Poin: <b>${userScore}</b></p>
+                    <p class="win-status-score">Total Menang (1-3): <b>${userWins}</b></p>
+                    <p class="win-status-rank">Peringkat: <b>#${rank}</b></p>
                 `);
 
             } catch (error) {
                 console.error("Error fetching user win status:", error);
-                content.html('<p class="text-red-400" style="font-size: 0.9rem;">Gagal mengambil data.</p>');
+                content.html('<p class="text-red-400">Gagal mengambil data.</p>');
             }
 
             setTimeout(() => {
