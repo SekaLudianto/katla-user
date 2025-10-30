@@ -25,6 +25,7 @@
             background: linear-gradient(-45deg, #111827, #1f2937, #111827, #374151);
             background-size: 400% 400%;
             animation: animateBackground 15s ease infinite;
+            overscroll-behavior-y: none; /* [BARU] Mencegah pull-to-refresh di mobile */
         }
         /* ... (scrollbar styles) ... */
         
@@ -34,20 +35,16 @@
         .chatcontainer > div, #leaderboard-container > div { background-color: rgba(31, 41, 55, 0.5); padding: 10px 12px; border-radius: 12px; margin-bottom: 8px; display: flex; align-items: center; font-size: 0.9rem; line-height: 1.4; transition: all 0.2s ease-in-out; }
         .chatcontainer > div:hover, #leaderboard-container > div:hover { background-color: rgba(55, 65, 81, 0.7); }
         
-        /* [BARU] Animasi untuk pesan chat baru */
+        /* ... (Animasi slideInFromRight tetap) ... */
         @keyframes slideInFromRight {
-            from {
-                opacity: 0;
-                transform: translateX(100%);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
         }
+        .chatcontainer > div.new-chat { animation: slideInFromRight 0.3s ease-out; }
 
-        .chatcontainer > div.new-chat {
-            animation: slideInFromRight 0.3s ease-out;
+        /* [BARU] Kontrol scroll untuk chat/leaderboard di mobile */
+        .chatcontainer, #leaderboard-container {
+             overscroll-behavior-y: contain;
         }
 
         #leaderboard-container > div { justify-content: space-between; }
@@ -61,36 +58,39 @@
             height: 400px; /* Tinggi tetap agar bisa scroll */
             overflow-y: scroll;
             scroll-behavior: smooth;
-            padding: 10px;
+            padding: 10px 4px; /* [DIUBAH] Kurangi padding horizontal untuk mobile */
             background-color: rgba(0,0,0,0.2);
             border-radius: 8px;
             border: 1px solid #374151;
+            overscroll-behavior-y: contain; /* [BARU] Mencegah scroll 'mental' */
         }
         
         /* ... (Styling wordle-row-container dan tile tetap sama) ... */
         .wordle-row-container {
             display: grid;
-            grid-template-columns: 52px 1fr 64px; /* PFP, Grid, Name */
+            /* [DIUBAH] Layout mobile-first yang lebih sempit */
+            grid-template-columns: 40px 1fr 50px; 
             align-items: center;
-            gap: 12px;
+            gap: 8px; /* [DIUBAH] Kurangi gap */
             margin-bottom: 8px;
             max-width: 500px;
             margin-left: auto;
             margin-right: auto;
         }
         .guesser-pfp {
-            width: 52px; height: 52px;
-            border-radius: 10px;
+             /* [DIUBAH] Ukuran PFP mobile-first */
+            width: 40px; height: 40px;
+            border-radius: 8px; /* [DIUBAH] */
             background-color: #374151;
             border: 2px solid #4b5563;
             object-fit: cover;
             transition: all 0.3s ease;
         }
         .guesser-name {
-            font-size: 0.75rem; /* 12px */
+            font-size: 0.7rem; /* [DIUBAH] Kecilkan font nama */
             font-weight: 600;
             color: #9ca3af; /* gray-400 */
-            line-height: 1.3;
+            line-height: 1.2; /* [DIUBAH] Rapatkan line */
             word-break: break-all;
             text-align: left;
         }
@@ -99,7 +99,7 @@
         }
         .guesser-chances {
             display: block; /* Agar di bawah nickname */
-            font-size: 0.7rem; /* 11px, lebih kecil */
+            font-size: 0.65rem; /* [DIUBAH] Kecilkan lagi */
             font-weight: 500;
             color: #f59e0b; /* Warna oranye/kuning */
             text-align: left;
@@ -113,17 +113,15 @@
         }
         .wordle-grid-row {
             display: grid;
-            grid-gap: 5px;
-            max-width: 350px;
+            grid-gap: 4px; /* [DIUBAH] Rapatkan gap tile */
+            /* [DIHAPUS] max-width: 350px; Biarkan 100% dari kolom 1fr */
         }
         .tile { 
-            position: relative; /* [DITAMBAH] Ini adalah jangkar untuk .front/.back */
+            position: relative; 
             width: 100%; 
-            /* [DIHAPUS] Properti flex ini tidak memengaruhi anak 'absolute' */
-            /* display: inline-flex; */
-            /* justify-content: center; */
-            /* align-items: center; */
-            font-size: 1.8rem; /* [DIUBAH] Sedikit lebih kecil dari 2rem */
+            /* [DIHAPUS] display: inline-flex; ... */
+            /* [DIUBAH] Ukuran font responsif (viewport width) */
+            font-size: 6vw; 
             line-height: 1; 
             font-weight: 800; 
             vertical-align: middle; 
@@ -131,14 +129,14 @@
             color: #fff; 
             text-transform: uppercase; 
             user-select: none; 
-            border: 2px solid #374151; 
-            border-radius: 8px; 
+            border: 1px solid #374151; /* [DIUBAH] Border lebih tipis */
+            border-radius: 6px; /* [DIUBAH] */
             background-color: #111827; 
             transition: transform 0.3s, background-color 0.3s, border-color 0.3s; 
             transform-style: preserve-3d; 
             aspect-ratio: 1 / 1; 
         } 
-        .tile::before { display: none; } /* [DIUBAH] Hack padding-bottom dinonaktifkan */
+        .tile::before { display: none; } 
         .tile.filled { border-color: #4b5563; }
         .tile.flip { transform: rotateX(180deg); }
         .tile .front, .tile .back { 
@@ -147,7 +145,6 @@
             z-index: 2; 
             transform: rotateX(0deg); 
             
-            /* [BARU] Ini cara yang benar untuk memusatkan huruf di dalam ubin */
             width: 100%;
             height: 100%;
             display: flex;
@@ -168,6 +165,7 @@
             max-width: 200px;
             margin: 0 auto 15px auto;
         }
+        /* ... (mini-tile styles) ... */
         .mini-tile {
             width: 100%;
             aspect-ratio: 1 / 1;
@@ -184,9 +182,11 @@
         .mini-tile.present { background-color: #f59e0b; border-color: #f59e0b; }
         .mini-tile.absent { background-color: #374151; border-color: #374151; }
 
+        /* ... (loader styles) ... */
         .loader { width: 24px; height: 24px; border: 3px solid #67e8f9; border-bottom-color: transparent; border-radius: 50%; display: inline-block; box-sizing: border-box; animation: rotation 1s linear infinite; }
         @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        /* ... (modal styles) ... */
         #infoModal { animation: modalFadeIn 0.3s ease-out; }
         @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         .modal-content-winner {
@@ -199,40 +199,33 @@
             -webkit-text-fill-color: transparent;
         }
         
-        /* [BARU] Animasi untuk timer rendah & status terhubung */
+        /* ... (timer styles) ... */
         @keyframes pulseRed {
             0% { transform: scale(1); color: #f87171; /* red-400 */ }
             50% { transform: scale(1.05); color: #ef4444; /* red-500 */ }
             100% { transform: scale(1); color: #f87171; /* red-400 */ }
         }
-
-        .timer-low {
-            animation: pulseRed 1s ease-in-out infinite;
-        }
+        .timer-low { animation: pulseRed 1s ease-in-out infinite; }
 
         @keyframes pulseGreen {
             0% { color: #86efac; /* green-300 */ }
             50% { color: #4ade80; /* green-400 */ }
             100% { color: #86efac; /* green-300 */ }
         }
+        #stateText.connected { animation: pulseGreen 1.5s ease-in-out infinite; }
 
-        #stateText.connected {
-            animation: pulseGreen 1.5s ease-in-out infinite;
-        }
-
-        /* [BARU] Animasi untuk gradien teks header */
+        /* ... (gradient text styles) ... */
         @keyframes animateTextGradient {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
         .animated-gradient-text {
             background-size: 200% 200%;
             animation: animateTextGradient 5s ease infinite;
         }
 
-        /* ... (Styling modal winner, rank, !win status tetap sama) ... */
+        /* ... (modal winner, rank, !win status styles) ... */
         .session-winner-list {
             display: flex;
             flex-direction: column;
@@ -275,46 +268,43 @@
         .win-status-score { font-size: 1.1rem; color: #e5e7eb; margin-top: 4px; }
         .win-status-rank { font-size: 1.1rem; color: #e5e7eb; }
 
-        /* [BARU] Style untuk Tombol Tab */
+        /* ... (tab button styles) ... */
         .tab-button {
-            display: inline-flex; /* Agar ikon dan teks sejajar */
+            display: inline-flex; 
             align-items: center;
-            gap: 0.5rem; /* 8px */
-            padding: 0.75rem 1rem; /* 12px 16px */
+            gap: 0.5rem; 
+            padding: 0.75rem 1rem; 
             font-weight: 600;
-            font-size: 0.9rem; /* Sedikit lebih kecil agar muat di mobile */
-            border-radius: 0.5rem 0.5rem 0 0; /* Hanya sudut atas yang rounded */
+            font-size: 0.9rem; 
+            border-radius: 0.5rem 0.5rem 0 0; 
             border: 1px solid transparent;
             cursor: pointer;
             transition: all 0.3s ease;
             white-space: nowrap;
         }
-        /* Style untuk Tombol Aktif */
         .tab-button.active {
-            background-color: #06b6d4; /* cyan-600 */
+            background-color: #06b6d4; 
             color: white;
-            border-color: #0891b2; /* cyan-700 */
+            border-color: #0891b2; 
         }
-        /* Style untuk Tombol Tidak Aktif */
         .tab-button.inactive {
-            background-color: rgba(55, 65, 81, 0.5); /* gray-700/50 */
-            color: #d1d5db; /* gray-300 */
+            background-color: rgba(55, 65, 81, 0.5); 
+            color: #d1d5db; 
             border-color: transparent;
         }
-        /* Hover state untuk Tombol Tidak Aktif */
         .tab-button.inactive:hover {
-            background-color: rgba(75, 85, 99, 0.7); /* gray-600/70 */
+            background-color: rgba(75, 85, 99, 0.7); 
             color: white;
         }
 
-        /* [BARU] Pastikan panel chat dan leaderboard punya tinggi yg sama di tab */
+        /* ... (tab panel height styles) ... */
         #chat-panel-container, #leaderboard-panel-container {
             height: 400px;
             display: flex;
             flex-direction: column;
         }
 
-        /* [BARU] CSS untuk Animasi Pemenang */
+        /* ... (winner celebration styles) ... */
         @keyframes celebrationFadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -324,32 +314,62 @@
             80% { transform: scale(1.05); opacity: 1; }
             100% { transform: scale(1) translateY(0); opacity: 1; }
         }
-
         #winnerCelebrationOverlay {
-            display: none; /* Diubah oleh JS ke flex */
+            display: none; 
             opacity: 0;
             background-color: rgba(0, 0, 0, 0.7);
-            /* Efek spotlight */
             background-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.8) 100%);
         }
-
         #winnerCelebrationOverlay.visible {
             display: flex;
             animation: celebrationFadeIn 0.3s ease-out forwards;
         }
-
         #winnerCelebrationCard {
-            opacity: 0; /* Mulai transparan */
+            opacity: 0; 
             transform: scale(0.7);
             will-change: transform, opacity;
             background: linear-gradient(145deg, #1f2937, #374151);
             border-width: 2px;
             box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1), 0 0 30px 0px rgba(6, 182, 212, 0.4);
         }
-
         #winnerCelebrationOverlay.visible #winnerCelebrationCard {
-            /* Memicu animasi pop-in */
             animation: celebrationPopIn 0.5s cubic-bezier(0.21, 1.02, 0.73, 1) 0.1s forwards;
+        }
+
+        /* [BARU] Media Query untuk layar lebih besar (Tablet/Desktop) */
+        @media (min-width: 450px) {
+            .tile {
+                font-size: 1.8rem; /* Kembalikan font-size jika layar > 450px */
+            }
+        }
+
+        @media (min-width: 640px) {
+             .wordle-row-container {
+                /* Kembalikan layout original di layar sm+ */
+                grid-template-columns: 52px 1fr 64px;
+                gap: 12px;
+            }
+            .guesser-pfp {
+                width: 52px; height: 52px;
+                border-radius: 10px;
+            }
+            .guesser-name {
+                font-size: 0.75rem; /* 12px */
+                line-height: 1.3;
+            }
+            .guesser-chances {
+                 font-size: 0.7rem; /* 11px */
+            }
+            .wordle-grid-row {
+                grid-gap: 5px; /* Kembalikan gap original */
+            }
+            .tile {
+                border-width: 2px;
+                border-radius: 8px;
+            }
+            #wordle-container {
+                 padding: 10px; /* Kembalikan padding original */
+            }
         }
     </style>
 </head>
