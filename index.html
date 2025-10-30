@@ -567,6 +567,20 @@
     <div id="validationToast" class="fixed top-28 right-5 bg-gradient-to-r from-red-600 to-pink-700 text-white py-3 px-5 rounded-lg shadow-lg z-50 opacity-0 transform translate-x-full transition-all duration-300 ease-in-out border border-red-400">
         <p id="validationToastContent" class="font-medium"></p>
     </div>
+
+    <!-- [BARU] Overlay Apresiasi Gift -->
+    <div id="giftAppreciationOverlay" class="fixed top-28 right-5 w-auto max-w-xs z-[49] transition-all duration-500 ease-in-out opacity-0 transform translate-x-full" style="pointer-events: none;">
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900/90 backdrop-blur-sm border border-pink-500/50 rounded-xl shadow-2xl p-4 flex items-center gap-3">
+            <img id="gift-pfp" src="https://placehold.co/56x56/374151/9ca3af?text=?" class="w-14 h-14 rounded-full border-2 border-pink-400 object-cover" onerror="this.src='https://placehold.co/56x56/374151/9ca3af?text=?';">
+            <div class="flex-1 min-w-0"> <!-- min-w-0 untuk wrapping teks yang benar -->
+                <p class="text-xs text-gray-300 font-medium">Terima kasih banyak!</p>
+                <h4 id="gift-name" class="text-white font-bold text-base leading-tight break-words truncate">Nickname</h4>
+                <p id="gift-message" class="text-xs text-pink-300 font-medium truncate">Mengirimkan 1x Gift</p>
+            </div>
+            <img id="gift-image" src="https://placehold.co/56x56/374151/9ca3af?text=GIFT" class="w-14 h-14 object-contain" onerror="this.src='https://placehold.co/56x56/374151/9ca3af?text=GIFT';">
+        </div>
+    </div>
+
     <div id="rankUpdateOverlay" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-80 backdrop-blur-md text-white py-4 px-6 rounded-lg shadow-lg z-50 transition-all duration-300 hidden border border-gray-700 w-full max-w-sm">
         <h4 class="font-bold text-center text-lg mb-3 text-cyan-400">Top 5 Peringkat</h4>
         <div id="rankUpdateList" class="space-y-2">
@@ -842,6 +856,22 @@
             }
         });
         
+        // [BARU] Menangani gift dari server.js
+        connection.on('gift', (msg) => {
+            // Abaikan gift-gift 'kecil' seperti Mawar (giftId 5655) agar tidak spam
+            if (msg.giftId === 5655) {
+                console.log("Rose gift skipped.");
+                return;
+            }
+
+            // Hanya proses jika gift selesai (bukan bagian dari streak)
+            // atau jika itu bukan gift beruntun (repeatEnd tidak ada atau false)
+            if (msg.repeatEnd || !msg.repeat) {
+                giftQueue.push(msg);
+                processGiftQueue();
+            }
+        });
+        
         // [BARU] Listener statistik (opsional, tapi ada di server.js)
         connection.on('statistic', (data) => {
             // console.log("Statistik global:", data.globalConnectionCount);
@@ -877,6 +907,10 @@
         
         let guessQueue = [];
         let userGuessCount = {}; // { userId: count }
+        
+        // [BARU] Antrian untuk notifikasi gift
+        let giftQueue = [];
+        let isShowingGift = false;
         
         let winnerListThisRound = []; 
         let isWaitingForNextGame = false; // [BARU] Status untuk jeda definisi
@@ -949,6 +983,44 @@
             });
         }
         
+        // [BARU] Fungsi untuk memproses antrian gift
+        function processGiftQueue() {
+            if (isShowingGift || giftQueue.length === 0) {
+                return; // Jangan tampilkan gift baru jika satu sedang tampil
+            }
+
+            isShowingGift = true;
+            const giftData = giftQueue.shift();
+            
+            showGiftAppreciation(giftData);
+        }
+
+        // [BARU] Fungsi untuk menampilkan overlay apresiasi gift
+        function showGiftAppreciation(data) {
+            const overlay = window.$('#giftAppreciationOverlay');
+            
+            // Isi data ke overlay
+            overlay.find('#gift-pfp').attr('src', data.profilePictureUrl || 'https://placehold.co/56x56/374151/9ca3af?text=?');
+            overlay.find('#gift-name').text(data.nickname || 'Seseorang');
+            overlay.find('#gift-message').html(`Mengirimkan <b>${data.repeatCount}x</b> ${data.giftName || 'Gift'}`);
+            overlay.find('#gift-image').attr('src', data.giftPictureUrl || 'https://placehold.co/56x56/374151/9ca3af?text=GIFT');
+
+            // Tampilkan overlay (animasi slide-in)
+            overlay.removeClass('opacity-0 translate-x-full');
+
+            // Sembunyikan setelah 5 detik
+            setTimeout(() => {
+                overlay.addClass('opacity-0 translate-x-full');
+
+                // Tunggu animasi selesai sebelum memproses gift berikutnya
+                setTimeout(() => {
+                    isShowingGift = false;
+                    processGiftQueue(); // Cek apakah ada gift lain di antrian
+                }, 500); // Durasi ini harus cocok dengan 'duration-500' di CSS
+                
+            }, 5000); // 5 detik tampil
+        }
+
         function updateTimer() {
             if (isGameOver) {
                 clearInterval(countdownTimer);
