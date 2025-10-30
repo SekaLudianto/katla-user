@@ -367,13 +367,12 @@
             </p>
         </header>
 
-        <!-- Kotak Koneksi (Tetap Sama) -->
+        <!-- [DIUBAH] Kotak Koneksi disesuaikan untuk server-railway-compatible.js -->
         <div class="bg-gray-900/50 p-6 rounded-xl border border-gray-700/50">
             <div class="space-y-4">
-                <!-- [DIHAPUS] Input Username TikTok -->
-                <!-- [DIHAPUS] Input Session ID -->
+                <input id="uniqueIdInput" type="text" placeholder="Masukkan @username TikTok Anda" class="w-full bg-gray-700 border border-gray-600 text-white placeholder-gray-400 text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block p-3" required>
                 <button id="connectButton" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-cyan-500 shadow-lg shadow-cyan-500/20">
-                    Hubungkan
+                    Hubungkan ke LIVE
                 </button>
             </div>
         </div>
@@ -563,8 +562,8 @@
          * ===============================================
          */
          
-        // [DIUBAH] Ganti URL ini dengan URL server backend Tikfinity Anda
-        let backendUrl = "https://5eab52737174.ngrok-free.app"; // CONTOH: "https://server-game-anda.com"
+        // [DIUBAH] Ganti URL ini dengan URL server backend Railway Anda
+        let backendUrl = "https://tiktok-serverv2-production.up.railway.app"; // [WAJIB DIISI] Ganti dengan URL Railway Anda! (cth: "https://proyek-anda.up.railway.app")
         let connection = io(backendUrl, { autoConnect: false }); // Jangan hubungkan otomatis
 
         let viewerCount = 0;
@@ -574,7 +573,8 @@
 
         if (!window.settings) window.settings = {};
 
-        $(document).ready(() => {
+        // [FIX] Ganti semua $ dengan window.$
+        window.$(document).ready(() => {
             // ... (init checks) ...
             if (!db) {
                 console.error("Firebase DB failed to initialize.");
@@ -585,37 +585,61 @@
             // [DIHAPUS] Logika memuat session ID dari localStorage
 
             // [DIUBAH] Ganti fungsi tombol connect untuk server baru
-            $('#connectButton').text('Hubungkan ke Server Game').click(function() {
-                $('#stateText').text('Menghubungkan ke server...').removeClass('connected');
+            window.$('#connectButton').text('Hubungkan ke LIVE').click(function() {
+                const uniqueId = window.$('#uniqueIdInput').val().trim().replace(/^@/, '');
+                if (!uniqueId) {
+                    window.$('#stateText').text('Harap masukkan @username TikTok Anda.');
+                    return;
+                }
+                
+                // [DIUBAH] Periksa apakah backendUrl sudah diisi
+                if (!backendUrl) {
+                    window.$('#stateText').text('Kesalahan: backendUrl belum diatur di dalam kode script!');
+                    console.error('backendUrl is not set. Please edit the script tag in wordle-frontend-adjusted.html and set the backendUrl variable.');
+                    showModal("Kesalahan Konfigurasi", "<p><b>backendUrl</b> belum diatur di dalam file HTML.</p><p>Harap edit file HTML, cari variabel <b>backendUrl</b>, dan isi dengan URL aplikasi Railway Anda.</p>");
+                    return;
+                }
+
+                window.$('#stateText').text(`Menghubungkan ke ${backendUrl}...`).removeClass('connected');
+                
+                // [DIUBAH] Atur URI socket sebelum menghubungkan
+                connection.io.uri = backendUrl;
                 connection.connect();
+                
+                // [DIUBAH] Mengirim event 'setUniqueId' ke server setelah terhubung
+                // Server akan merespon dengan 'tiktokConnected' jika berhasil
+                connection.off('connect').on('connect', () => {
+                     window.$('#stateText').text('Terhubung ke server game! Mengautentikasi dengan TikTok...');
+                     connection.emit('setUniqueId', uniqueId);
+                });
             });
             
             // [DIHAPUS] Event listener untuk 'uniqueIdInput'
 
             initializeWordle();
-            $('#closeModalButton').on('click', () => $('#infoModal').addClass('hidden'));
+            window.$('#closeModalButton').on('click', () => window.$('#infoModal').addClass('hidden'));
             
-            $('#userWinStatusOverlay').on('click', () => $('#userWinStatusOverlay').addClass('hidden'));
-            $('#rankUpdateOverlay').on('click', () => $('#rankUpdateOverlay').addClass('hidden'));
+            window.$('#userWinStatusOverlay').on('click', () => window.$('#userWinStatusOverlay').addClass('hidden'));
+            window.$('#rankUpdateOverlay').on('click', () => window.$('#rankUpdateOverlay').addClass('hidden'));
             
             // [BARU] Logika untuk Tab
-            $('.tab-button').on('click', function() {
-                const targetPanel = $(this).data('tab'); // 'game', 'chat', or 'leaderboard'
+            window.$('.tab-button').on('click', function() {
+                const targetPanel = window.$(this).data('tab'); // 'game', 'chat', or 'leaderboard'
 
                 // 1. De-aktivasi semua tombol, sembunyikan semua panel
-                $('.tab-button').removeClass('active').addClass('inactive');
-                $('.tab-content').addClass('hidden');
+                window.$('.tab-button').removeClass('active').addClass('inactive');
+                window.$('.tab-content').addClass('hidden');
 
                 // 2. Aktivasi tombol yang diklik, tampilkan panel target
-                $(this).removeClass('inactive').addClass('active');
-                $('#' + targetPanel + '-panel').removeClass('hidden');
+                window.$(this).removeClass('inactive').addClass('active');
+                window.$('#' + targetPanel + '-panel').removeClass('hidden');
 
                 // [FIX] Auto-scroll ke atas jika pindah ke tab chat/leaderboard
                 if(targetPanel === 'chat') {
-                    $('.chatcontainer').stop().animate({ scrollTop: $('.chatcontainer')[0].scrollHeight }, 0);
+                    window.$('.chatcontainer').stop().animate({ scrollTop: window.$('.chatcontainer')[0].scrollHeight }, 0);
                 }
                 if(targetPanel === 'leaderboard') {
-                    $('#leaderboard-container').stop().animate({ scrollTop: 0 }, 0);
+                    window.$('#leaderboard-container').stop().animate({ scrollTop: 0 }, 0);
                 }
             });
             
@@ -623,33 +647,44 @@
             displayLeaderboard(); 
         });
 
-        // [BARU] Listener untuk koneksi ke server backend (Tikfinity)
-        connection.on('connect', () => {
-            $('#stateText').text('Terhubung ke Server Tikfinity! Menunggu data LIVE...').addClass('connected');
-            // Anda bisa memulai game di sini jika mau, atau menunggu event dari server
+        // [DIUBAH] Listener untuk koneksi ke server backend (Tikfinity)
+        connection.on('tiktokConnected', (state) => {
+            window.$('#stateText').text(`Terhubung ke LIVE @${state.uniqueId}!`).addClass('connected');
+            // Memulai game setelah koneksi TikTok berhasil
             startNewGame(); 
         });
 
+        connection.on('tiktokDisconnected', (errorMessage) => {
+            window.$('#stateText').text(`Koneksi TikTok Gagal/Terputus: ${errorMessage}. Mencoba lagi...`).removeClass('connected');
+        });
+
+        connection.on('streamEnd', () => {
+            window.$('#stateText').text('LIVE telah berakhir.').removeClass('connected');
+            isGameOver = true;
+            clearInterval(countdownTimer);
+        });
+
+        // [DIUBAH] Listener disconnect socket.io umum
         connection.on('disconnect', () => {
-            $('#stateText').text('Koneksi ke Server Tikfinity terputus.').removeClass('connected');
+            window.$('#stateText').text('Koneksi ke Server Game terputus.').removeClass('connected');
         });
 
         // [DIHAPUS] Fungsi connect() yang lama tidak diperlukan lagi
         
         // ... (sanitize, updateRoomStats, generateUsernameLink, isPendingStreak, addChatItem) ...
         function sanitize(text) { return text.replace(/</g, '&lt;') }
-        function updateRoomStats() { $('#roomStats').html(`Viewers: <b class="text-white">${viewerCount.toLocaleString()}</b> Likes: <b class="text-white">${likeCount.toLocaleString()}</b> Diamonds: <b class="text-white">${diamondsCount.toLocaleString()}</b>`) }
+        function updateRoomStats() { window.$('#roomStats').html(`Viewers: <b class="text-white">${viewerCount.toLocaleString()}</b> Likes: <b class="text-white">${likeCount.toLocaleString()}</b> Diamonds: <b class="text-white">${diamondsCount.toLocaleString()}</b>`) }
         function generateUsernameLink(data) { return `<a class="usernamelink" href="https://www.tiktok.com/@${data.uniqueId}" target="_blank">${data.nickname}</a>`; }
         function isPendingStreak(data) { return data.giftType === 1 && !data.repeatEnd; }
         
         function addChatItem(color, data, text, summarize) {
-            let container = $('.chatcontainer');
+            let container = window.$('.chatcontainer');
             if (container.find('div').length > 500) { container.find('div').slice(0, 200).remove(); }
             container.find('.temporary').remove();;
 
             container.find('.new-chat').removeClass('new-chat'); // Hapus kelas dari yang lama
             
-            const newChatItem = $(
+            const newChatItem = window.$(
                 `<div class="${summarize ? 'temporary' : 'static'} new-chat">
                     <img class="miniprofilepicture" src="${data.profilePictureUrl}">
                     <span>
@@ -665,9 +700,7 @@
         
         // ... (Event listener koneksi TikTok: roomUser, like, member, chat, social, streamEnd) ...
         
-        // [DIUBAH] Listener lama dihapus dan diganti dengan listener untuk 'tiktokBatch'
-        
-        // Listener untuk event "tiktokBatch" dari server.js Anda
+        // [DIUBAH] Listener ini sekarang berfungsi karena backend baru mengirimkan batch yang sesuai
         connection.on('tiktokBatch', (batch) => {
             if (!Array.isArray(batch)) return; // Pastikan data adalah array
 
@@ -675,16 +708,13 @@
                 
                 // Siapkan data pengguna universal
                 const userData = {
-                    userId: event.user || event.userId || event.uniqueId,
+                    userId: event.userId || event.uniqueId, // Gunakan userId atau uniqueId
                     nickname: event.nickname,
-                    profilePictureUrl: event.pfp || event.profilePictureUrl
+                    profilePictureUrl: event.profilePictureUrl
                 };
 
-                // Server Anda mengirim { type: "guess", ... }
                 if (event.type === 'guess') {
                     const guessData = event.guess; // "WORDL"
-
-                    // Server Anda sudah memfilter 5 huruf, jadi kita bisa langsung menambahkannya
                     guessQueue.push({ 
                         guess: guessData, 
                         user: userData, 
@@ -693,15 +723,15 @@
                     processGuessQueue(); 
                 
                 } else if (event.type === 'chat') {
-                    // [BARU] Menangani obrolan biasa
-                    addChatItem('', userData, event.text);
+                    // [BEKERJA] Menangani obrolan biasa
+                    addChatItem('', userData, event.comment); // event.comment dari server baru
 
                 } else if (event.type === 'winCheck') {
-                    // [BARU] Menangani perintah !win
+                    // [BEKERJA] Menangani perintah !win
                     showUserWinStatus(userData.userId, userData.nickname, userData.profilePictureUrl);
 
                 } else if (event.type === 'like') {
-                    // [BARU] Menangani like
+                    // [BEKERJA] Menangani like
                     if (typeof event.totalLikeCount === 'number') {
                         likeCount = event.totalLikeCount;
                         updateRoomStats();
@@ -711,49 +741,28 @@
                     }
 
                 } else if (event.type === 'member') {
-                    // [BARU] Menangani member baru
+                    // [BEKERJA] Menangani member baru
                     addChatItem('#2dd4bf', event, 'bergabung', true);
 
                 } else if (event.type === 'roomUser') {
-                    // [BARU] Menangani update viewer
+                    // [BEKERJA] Menangani update viewer
                     if (typeof event.viewerCount === 'number') {
                         viewerCount = event.viewerCount;
                         updateRoomStats();
                     }
                 
                 } else if (event.type === 'social') {
-                    // [BARU] Menangani follow/share
+                    // [BEKERJA] Menangani follow/share
                     if (event.label) {
                         let color = event.displayType.includes('follow') ? '#f43f5e' : '#2fb816';
                         addChatItem(color, event, event.label.replace('{0:user}', ''));
                     }
                 }
-                
-                // [DIHAPUS] Menangani perintah !next
-                /*
-                else if (event.type === 'nextGame') {
-                    if (isWaitingForNextGame) {
-                        console.log("!next command received during definition. Proceeding.");
-                        // Optional: Tampilkan di chat siapa yang memulai
-                        // addChatItem('#f59e0b', userData, 'memulai ronde berikutnya...');
-                        proceedToNextGame();
-                    }
-                }
-                */
-                
-                // CATATAN: Event lain seperti 'chat' biasa, 'like', 'follow',
-                // dan 'roomUser' tidak ditangani di sini karena server.js Anda
-                // tidak mengirimkannya.
             });
         });
         
-        // [DIHAPUS] Semua listener lama (roomUser, like, member, chat, social, streamEnd)
-        // connection.on('roomUser', (msg) => { ... })
-        // connection.on('like', (msg) => { ... })
-        // connection.on('member', (msg) => { ... })
-        // connection.on('chat', (msg) => { ... })
-        // connection.on('social', (data) => { ... })
-        // connection.on('streamEnd', () => { ... })
+        // [DIHAPUS] Semua listener lama (roomUser, like, member, chat, social)
+        // karena sekarang ditangani oleh 'tiktokBatch'
 
 
         /**
@@ -761,6 +770,9 @@
          * BAGIAN 3: WORDLE (KATLA) GAME LOGIC
          * ===============================================
          */
+        
+        // ... (Seluruh logika game Wordle, Firebase, dan UI tetap SAMA) ...
+        // ... (Tidak ada perubahan dari baris ini ke bawah) ...
         
         const WORD_LENGTH = 5;
         const GAME_DURATION = 300; 
@@ -799,13 +811,13 @@
                 
                 if (isGamePaused && !wasPaused) {
                     clearInterval(countdownTimer);
-                    $('#wordle-message').html('<span class="text-red-500 font-bold">PERMAINAN DIJEDA OLEH ADMIN</span>');
+                    window.$('#wordle-message').html('<span class="text-red-500 font-bold">PERMAINAN DIJEDA OLEH ADMIN</span>');
                 } else if (!isGamePaused && wasPaused) {
                     if (!isGameOver) {
                         countdownTimer = setInterval(updateTimer, 1000);
                     }
-                    if ($('#wordle-message').text().includes("DIJEDA")) {
-                        $('#wordle-message').text('');
+                    if (window.$('#wordle-message').text().includes("DIJEDA")) {
+                        window.$('#wordle-message').text('');
                     }
                     processGuessQueue(); 
                 }
@@ -846,7 +858,6 @@
             });
         }
         
-        // [BARU] FUNGSI DIKEMBALIKAN
         function updateTimer() {
             if (isGameOver) {
                 clearInterval(countdownTimer);
@@ -855,7 +866,7 @@
             timeLeft--;
             const minutes = Math.floor(timeLeft / 60);
             const seconds = timeLeft % 60;
-            const timerDisplay = $('#timer-display');
+            const timerDisplay = window.$('#timer-display');
             timerDisplay.text(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
 
             if (timeLeft <= 30) {
@@ -867,9 +878,8 @@
             }
         }
         
-        // [BARU] FUNGSI DIKEMBALIKAN
         function updateBestGuessUI(bestGuessData) {
-            const container = $('#best-guess-container');
+            const container = window.$('#best-guess-container');
             container.empty();
             let tilesHtml = '';
             for (let i = 0; i < WORD_LENGTH; i++) {
@@ -878,32 +888,29 @@
             container.html(tilesHtml);
         }
 
-        // [BARU] FUNGSI DIKEMBALIKAN
         function initializeWordle() {
-            containerElement = $('#wordle-container');
-            $('#newGameButton').on('click', startNewGame);
-            $('#timer-display').text(`${Math.floor(GAME_DURATION / 60).toString().padStart(2, '0')}:${(GAME_DURATION % 60).toString().padStart(2, '0')}`);
-            $('#wordle-message').html('Hubungkan ke LIVE untuk memulai...');
+            containerElement = window.$('#wordle-container');
+            window.$('#newGameButton').on('click', startNewGame);
+            window.$('#timer-display').text(`${Math.floor(GAME_DURATION / 60).toString().padStart(2, '0')}:${(GAME_DURATION % 60).toString().padStart(2, '0')}`);
+            window.$('#wordle-message').html('Hubungkan ke LIVE untuk memulai...');
         }
         
-        // [BARU] FUNGSI DIKEMBALIKAN
         function showModal(title, content, autoCloseDelay = null) {
-            $('#modalTitle').text(title);
-            $('#modalContent').html(content);
-            $('#infoModal').removeClass('hidden');
+            window.$('#modalTitle').text(title);
+            window.$('#modalContent').html(content);
+            window.$('#infoModal').removeClass('hidden');
 
             if (autoCloseDelay) {
                 setTimeout(() => {
-                    $('#infoModal').addClass('hidden');
+                    window.$('#infoModal').addClass('hidden');
                 }, autoCloseDelay);
             }
         }
 
-        // [BARU] FUNGSI DIKEMBALIKAN
         function showValidationToast(content) {
             clearTimeout(validationToastTimeout);
-            const toast = $('#validationToast');
-            $('#validationToastContent').html(content);
+            const toast = window.$('#validationToast');
+            window.$('#validationToastContent').html(content);
             toast.removeClass('opacity-0 translate-x-full');
             validationToastTimeout = setTimeout(() => {
                 toast.addClass('opacity-0 translate-x-full');
@@ -911,7 +918,6 @@
             processGuessQueue(); 
         }
         
-        // [BARU] FUNGSI DIKEMBALIKAN
         async function fetchRandomWordFromFirebase(length) {
             if (wordCache[length] && wordCache[length].length > 0) {
                 return wordCache[length][Math.floor(Math.random() * wordCache[length].length)];
@@ -930,7 +936,6 @@
             }
         }
         
-        // [BARU] FUNGSI DIKEMBALIKAN
         async function validateWordWithFirebase(word) {
             try {
                 const wordRef = doc(db, "words", word.toUpperCase());
@@ -942,7 +947,6 @@
             }
         }
 
-        // [BARU] FUNGSI DIKEMBALIKAN
         async function startNewGame() {
             if (isProcessingGuess) return;
             if (!db) {
@@ -950,20 +954,20 @@
                 return;
             }
             
-            $('#rankUpdateOverlay').addClass('hidden');
+            window.$('#rankUpdateOverlay').addClass('hidden');
             
             isProcessingGuess = true;
             isGameOver = true;
             
             clearInterval(countdownTimer);
             timeLeft = GAME_DURATION;
-            $('#timer-display').text(`${Math.floor(GAME_DURATION / 60).toString().padStart(2, '0')}:${(GAME_DURATION % 60).toString().padStart(2, '0')}`);
-            $('#timer-display').removeClass('timer-low'); // Hapus kelas animasi
+            window.$('#timer-display').text(`${Math.floor(GAME_DURATION / 60).toString().padStart(2, '0')}:${(GAME_DURATION % 60).toString().padStart(2, '0')}`);
+            window.$('#timer-display').removeClass('timer-low'); // Hapus kelas animasi
             
-            $('#wordle-message').html('<span class="loader"></span><span class="ml-2 text-cyan-300">Memuat kata baru...</span>');
+            window.$('#wordle-message').html('<span class="loader"></span><span class="ml-2 text-cyan-300">Memuat kata baru...</span>');
             
             containerElement.empty();
-            $('#best-guess-container').empty();
+            window.$('#best-guess-container').empty();
             
             bestGuess = { score: -1, word: "", classes: [] };
             guessCount = 0;
@@ -980,7 +984,7 @@
                 const wordData = await fetchRandomWordFromFirebase(WORD_LENGTH);
                 if (!wordData || wordData.word === "ERROR") {
                     isProcessingGuess = false;
-                    $('#wordle-message').text('Gagal memuat kata. Coba lagi.');
+                    window.$('#wordle-message').text('Gagal memuat kata. Coba lagi.');
                     return;
                 }
                 targetWord = wordData.word;
@@ -998,13 +1002,12 @@
             isGameOver = false;
             isProcessingGuess = false;
             if (!isGamePaused) {
-                $('#wordle-message').text('');
+                window.$('#wordle-message').text('');
                 countdownTimer = setInterval(updateTimer, 1000);
             }
             processGuessQueue(); 
         }
 
-        // [BARU] FUNGSI DIKEMBALIKAN
         async function triggerEndGameSequence() {
             if (isGameOver) return; 
             
@@ -1012,9 +1015,6 @@
             clearInterval(countdownTimer);
             console.log("Triggering End Game Sequence...");
 
-            // [DIUBAH] Logika modal pemenang/kalah dihapus.
-            // Notifikasi pemenang pertama ditangani oleh showWinnerCelebration.
-            // Notifikasi Waktu Habis (jika tidak ada pemenang) ditambahkan.
             if (winnerListThisRound.length === 0) {
                  // Hanya tampilkan "WAKTU HABIS" jika tidak ada pemenang
                 let content = `<p class="text-lg">WAKTU HABIS! Tidak ada pemenang.</p>`;
@@ -1025,14 +1025,11 @@
                 await new Promise(resolve => setTimeout(resolve, 5000));
             }
             
-            $('#infoModal').addClass('hidden'); // Sembunyikan modal (baik Waktu Habis atau modal sebelumnya)
+            window.$('#infoModal').addClass('hidden'); // Sembunyikan modal (baik Waktu Habis atau modal sebelumnya)
 
             // 2. Tampilkan Modal Definisi
             const definitionTitle = `Definisi: ${targetWord}`;
-            // [DIUBAH] Hapus instruksi !next
             let definitionContent = `<div class="text-left"><p class="text-base text-gray-200">${targetWordDefinition || 'Definisi tidak tersedia.'}</p></div>`;
-            // [DIHAPUS] Instruksi !next
-            // definitionContent += `<p class="text-center text-cyan-300 font-medium mt-4 text-sm">Ketik <b class="text-white">!next</b> di chat atau tunggu Host<br>untuk memulai ronde berikutnya.</p>`;
             
             showModal(definitionTitle, definitionContent);
             
@@ -1043,28 +1040,26 @@
             setTimeout(proceedToNextGame, 10000); 
         }
 
-        // [BARU] FUNGSI DIKEMBALIKAN
         async function proceedToNextGame() {
             if (!isWaitingForNextGame) return; // Hindari trigger ganda
             
             isWaitingForNextGame = false;
             
-            $('#infoModal').addClass('hidden');
+            window.$('#infoModal').addClass('hidden');
             
             // 3. Tampilkan Overlay Peringkat
             showRankUpdateOverlay(); 
             
             await new Promise(resolve => setTimeout(resolve, 5000));
-            $('#rankUpdateOverlay').addClass('hidden'); 
+            window.$('#rankUpdateOverlay').addClass('hidden'); 
 
             isProcessingGuess = false;
 
             // 4. Mulai Game Baru
-            $('#wordle-message').html(`<span class="text-gray-400">Memulai ronde berikutnya...</span>`);
+            window.$('#wordle-message').html(`<span class="text-gray-400">Memulai ronde berikutnya...</span>`);
             setTimeout(startNewGame, 1000);
         }
 
-        // [BARU] FUNGSI DIKEMBALIKAN
         async function updateGlobalScore(userId, nickname, pfp, pointsToAdd) {
             if (!userId || userId === 'admin_manual') return; 
             
@@ -1095,9 +1090,8 @@
             }
         }
         
-        // [BARU] FUNGSI DIKEMBALIKAN
         function displayLeaderboard() {
-            const leaderboardContainer = $('#leaderboard-container');
+            const leaderboardContainer = window.$('#leaderboard-container');
             const q = query(
                 collection(db, "leaderboard"), 
                 orderBy("globalScore", "desc"), 
@@ -1135,7 +1129,6 @@
             });
         }
 
-        // [BARU] FUNGSI DIKEMBALIKAN
         function processGuessQueue() {
             if (isGamePaused || isGameOver || isProcessingGuess || guessQueue.length === 0) {
                 return;
@@ -1147,12 +1140,11 @@
             handleGuess(nextGuessData.guess, nextGuessData.user, nextGuessData.isManual);
         }
 
-        // [BARU] Fungsi untuk menampilkan overlay perayaan
         function showWinnerCelebration(user, rankText) {
             // Mengembalikan Promise agar kita bisa menunggu animasinya selesai
             return new Promise(resolve => {
-                const overlay = $('#winnerCelebrationOverlay');
-                const card = $('#winnerCelebrationCard');
+                const overlay = window.$('#winnerCelebrationOverlay');
+                const card = window.$('#winnerCelebrationCard');
 
                 // 1. Reset
                 overlay.removeClass('visible');
@@ -1257,7 +1249,7 @@
 
             for (let i = 0; i < WORD_LENGTH; i++) {
                 await new Promise(resolve => setTimeout(resolve, 100)); /* [DIUBAH] 250 -> 100 */
-                const tile = $(currentTiles[i]);
+                const tile = window.$(currentTiles[i]);
                 tile.addClass('flip').find('.back').parent().addClass(letterClasses[i]);
             }
             
@@ -1303,9 +1295,6 @@
                         updateGlobalScore(userId, userData.nickname, userData.profilePictureUrl, pointsToAdd);
                     }
                     
-                    // [DIUBAH] Tampilkan perayaan, BUKAN toast
-                    // showValidationToast(`<b>${sanitize(userData.nickname)}</b> adalah <b>${rankText}</b>!`);
-                    
                     isProcessingGuess = true; // Jeda antrian selagi perayaan
                     await showWinnerCelebration(userData, celebrationText); // [DIUBAH] Menggunakan celebrationText
 
@@ -1335,7 +1324,7 @@
                     }
                     
                     console.log("Manual guess winner. Triggering end game sequence.");
-                    triggerEndGLogicameSequence();
+                    triggerEndGameSequence();
                     return; 
                 }
                 
@@ -1347,7 +1336,7 @@
         }
 
         async function showRankUpdateOverlay() {
-            const overlay = $('#rankUpdateOverlay');
+            const overlay = window.$('#rankUpdateOverlay');
             const list = overlay.find('#rankUpdateList');
             list.html('<span class="loader"></span>');
             overlay.removeClass('hidden');
@@ -1387,7 +1376,7 @@
 
         async function showUserWinStatus(userId, nickname, pfp) {
             if (!userId) return;
-            const overlay = $('#userWinStatusOverlay');
+            const overlay = window.$('#userWinStatusOverlay');
             const content = overlay.find('#userWinStatusContent');
             content.html('<span class="loader"></span><p class="mt-2">Mencari data...</p>');
             overlay.removeClass('hidden');
