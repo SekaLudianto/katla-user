@@ -355,7 +355,7 @@
 </head>
 <body class="bg-gray-900 text-gray-200 flex items-center justify-center min-h-screen p-4">
 
-    <!-- [DIUBAH] Seluruh Konten dibungkus dalam div ini -->
+    <!-- [TIDAK DIUBAH] Seluruh Konten dibungkus dalam div ini -->
     <div class="w-full max-w-6xl mx-auto bg-gray-800/60 rounded-2xl shadow-2xl shadow-black/30 p-4 sm:p-6 md:p-8 space-y-6 backdrop-blur-sm border border-gray-700/50">
         
         <header class="text-center border-b border-gray-700 pb-4">
@@ -367,7 +367,7 @@
             </p>
         </header>
 
-        <!-- [DIUBAH] Kotak Koneksi disesuaikan untuk server-railway-compatible.js -->
+        <!-- [TIDAK DIUBAH] Kotak Koneksi disesuaikan untuk server-railway-compatible.js -->
         <div class="bg-gray-900/50 p-6 rounded-xl border border-gray-700/50">
             <div class="space-y-4">
                 <input id="uniqueIdInput" type="text" placeholder="Masukkan @username TikTok Anda" class="w-full bg-gray-700 border border-gray-600 text-white placeholder-gray-400 text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block p-3" required>
@@ -377,7 +377,7 @@
             </div>
         </div>
 
-        <!-- Kotak Status & Stats (Tetap Sama) -->
+        <!-- [TIDAK DIUBAH] Kotak Status & Stats -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-gray-700/50 rounded-xl p-4 min-h-[100px] flex flex-col justify-center items-center border border-gray-700/50">
                 <h3 class="font-semibold text-white mb-2 text-center">Status Koneksi</h3>
@@ -389,7 +389,7 @@
             </div>
         </div>
 
-        <!-- [BARU] Navigasi Tab -->
+        <!-- [TIDAK DIUBAH] Navigasi Tab -->
         <div class="border-b border-gray-700">
             <div class="flex flex-wrap -mb-px gap-2">
                 <!-- Tombol Tab Permainan (Aktif by default) -->
@@ -412,14 +412,14 @@
                 <button class="tab-button inactive" data-tab="leaderboard">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M8 0l1.669.864 1.858.282.842 1.68.56.932 1.767.437 1.06 1.528.23 1.834-1.218.875-1.071 1.528-.4 1.76-.932.56-1.68.842-.282 1.858L8 16l-1.669-.864-1.858-.282-.842-1.68-.56-.932-1.767-.437-1.06-1.528-.23-1.834 1.218.875 1.071 1.528.4-1.76.932.56 1.68-.842.282-1.858L8 0z"/>
-                        <path d="M4 11.794V12a4 4 0 0 0 .813 2.126L5.305 15.16v.63C5.181 15.903 5 15.95 5 16h6c0-.05-.181-.097-.305-.11v-.63l.492-1.034A4 4 0 0 0 12 12v-.206c-.05.01-.1.018-.15.025v.18a3 3 0 0 1-1 1.706l-.493 1.033H5.642l-.493-1.033A3 3 0 0 1 4 12.006v-.18c-.05-.007-.1-.015-.15-.025z"/>
+                        <path d="M4 11.794V12a4 4 0 0 0 .813 2.126L5.305 15.16v.63C5.181 15.903 5 15.95 5 16h6c0-.05-.181-.097-.305-.11v-.63l.492-1.034A4 4 0 0 0 12 12v-.206c-.05.01-.1.018-.15.025v.input.8a3 3 0 0 1-1 1.706l-.493 1.033H5.642l-.493-1.033A3 3 0 0 1 4 12.006v-.18c-.05-.007-.1-.015-.15-.025z"/>
                     </svg>
                     Peringkat
                 </button>
             </div>
         </div>
 
-        <!-- [BARU] Kontainer Konten Tab -->
+        <!-- [TIDAK DIUBAH] Kontainer Konten Tab -->
         <div>
             <!-- Panel Permainan (Aktif by default) -->
             <div id="game-panel" class="tab-content">
@@ -465,11 +465,9 @@
             </div>
         </div>
 
-        <!-- [DIHAPUS] Grid 2 kolom untuk chat & leaderboard dihilangkan -->
-        <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-6"> ... </div> -->
     </div>
     
-    <!-- ... (Modal, Toast, dan Overlay lainnya tetap sama) ... -->
+    <!-- [TIDAK DIUBAH] Modal, Toast, dan Overlay lainnya -->
     <div id="infoModal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 hidden backdrop-blur-sm">
         <div class="bg-gray-800 rounded-2xl shadow-xl w-full max-w-md border border-gray-700 modal-content-winner">
             <div class="p-6">
@@ -497,7 +495,7 @@
         </div>
     </div>
 
-    <!-- [BARU] Overlay Perayaan Pemenang -->
+    <!-- [TIDAK DIUBAH] Overlay Perayaan Pemenang -->
     <div id="winnerCelebrationOverlay" class="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
         <div id="winnerCelebrationCard" class="w-full max-w-md rounded-2xl border-cyan-400 p-8 text-center">
             <p id="celebration-title" class="text-3xl font-bold text-yellow-400 uppercase tracking-wider">BERHASIL!</p>
@@ -516,7 +514,7 @@
 
     <!-- Script Module -->
     <script type="module">
-        // Import fungsi Firebase
+        // [TIDAK DIUBAH] Import fungsi Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
         import { 
@@ -532,10 +530,10 @@
             setDoc,
             orderBy,
             limit,
-            increment // [BARU] Import increment
+            increment
         } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-        // ... (Firebase Config) ...
+        // [TIDAK DIUBAH] Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyBmkg2rZNL0D_lpF2QMZmgle4ASTrIT_r0",
             authDomain: "kuis-tiktok-c9272.firebaseapp.com",
@@ -546,15 +544,13 @@
             measurementId: "G-EPXM197FME"
         };
 
-        // Inisialisasi Firebase
+        // [TIDAK DIUBAH] Inisialisasi Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
         signInAnonymously(auth).catch((error) => console.error("Anonymous sign-in failed:", error));
 
-        // [DIHAPUS] Kelas TikTokIOConnection tidak lagi diperlukan
-        // class TikTokIOConnection { ... }
 
         /**
          * ===============================================
@@ -562,9 +558,9 @@
          * ===============================================
          */
          
-        // [DIUBAH] Ganti URL ini dengan URL server backend Railway Anda
-        let backendUrl = "https://tiktok-server-production-e573.up.railway.app"; // [WAJIB DIISI] Ganti dengan URL Railway Anda! (cth: "https://proyek-anda.up.railway.app")
-        let connection = io(backendUrl, { autoConnect: false }); // Jangan hubungkan otomatis
+        // [TIDAK DIUBAH] URL Backend (Harap isi manual jika perlu)
+        let backendUrl = "https://tiktok-server-production-e573.up.railway.app"; 
+        let connection = io(backendUrl, { autoConnect: false }); 
 
         let viewerCount = 0;
         let likeCount = 0;
@@ -573,18 +569,16 @@
 
         if (!window.settings) window.settings = {};
 
-        // [FIX] Ganti semua $ dengan window.$
+        // [TIDAK DIUBAH] Document Ready
         window.$(document).ready(() => {
-            // ... (init checks) ...
+            
             if (!db) {
                 console.error("Firebase DB failed to initialize.");
                 showModal("Error Kritis", "<p>Koneksi database gagal. Harap refresh halaman.</p>");
                 return; 
             } 
 
-            // [DIHAPUS] Logika memuat session ID dari localStorage
-
-            // [DIUBAH] Ganti fungsi tombol connect untuk server baru
+            // [TIDAK DIUBAH] Logika tombol Connect
             window.$('#connectButton').text('Hubungkan ke LIVE').click(function() {
                 const uniqueId = window.$('#uniqueIdInput').val().trim().replace(/^@/, '');
                 if (!uniqueId) {
@@ -592,7 +586,6 @@
                     return;
                 }
                 
-                // [DIUBAH] Periksa apakah backendUrl sudah diisi
                 if (!backendUrl) {
                     window.$('#stateText').text('Kesalahan: backendUrl belum diatur di dalam kode script!');
                     console.error('backendUrl is not set. Please edit the script tag in wordle-frontend-adjusted.html and set the backendUrl variable.');
@@ -602,39 +595,29 @@
 
                 window.$('#stateText').text(`Menghubungkan ke ${backendUrl}...`).removeClass('connected');
                 
-                // [DIUBAH] Atur URI socket sebelum menghubungkan
                 connection.io.uri = backendUrl;
                 connection.connect();
                 
-                // [DIUBAH] Mengirim event 'setUniqueId' ke server setelah terhubung
-                // Server akan merespon dengan 'tiktokConnected' jika berhasil
                 connection.off('connect').on('connect', () => {
                      window.$('#stateText').text('Terhubung ke server game! Mengautentikasi dengan TikTok...');
+                     // [TIDAK DIUBAH] Mengirim 'setUniqueId' ke server
                      connection.emit('setUniqueId', uniqueId);
                 });
             });
             
-            // [DIHAPUS] Event listener untuk 'uniqueIdInput'
-
+            // [TIDAK DIUBAH] Inisialisasi UI
             initializeWordle();
             window.$('#closeModalButton').on('click', () => window.$('#infoModal').addClass('hidden'));
-            
             window.$('#userWinStatusOverlay').on('click', () => window.$('#userWinStatusOverlay').addClass('hidden'));
             window.$('#rankUpdateOverlay').on('click', () => window.$('#rankUpdateOverlay').addClass('hidden'));
             
-            // [BARU] Logika untuk Tab
+            // [TIDAK DIUBAH] Logika Tab
             window.$('.tab-button').on('click', function() {
-                const targetPanel = window.$(this).data('tab'); // 'game', 'chat', or 'leaderboard'
-
-                // 1. De-aktivasi semua tombol, sembunyikan semua panel
+                const targetPanel = window.$(this).data('tab'); 
                 window.$('.tab-button').removeClass('active').addClass('inactive');
                 window.$('.tab-content').addClass('hidden');
-
-                // 2. Aktivasi tombol yang diklik, tampilkan panel target
                 window.$(this).removeClass('inactive').addClass('active');
                 window.$('#' + targetPanel + '-panel').removeClass('hidden');
-
-                // [FIX] Auto-scroll ke atas jika pindah ke tab chat/leaderboard
                 if(targetPanel === 'chat') {
                     window.$('.chatcontainer').stop().animate({ scrollTop: window.$('.chatcontainer')[0].scrollHeight }, 0);
                 }
@@ -643,19 +626,21 @@
                 }
             });
             
+            // [TIDAK DIUBAH] Listener Game Control
             listenToGameControl();
             displayLeaderboard(); 
         });
 
-        // [DIUBAH] Listener untuk koneksi ke server backend (Tikfinity)
+        // [TIDAK DIUBAH] Listener koneksi dari server.js
         connection.on('tiktokConnected', (state) => {
-            window.$('#stateText').text(`Terhubung ke LIVE @${state.uniqueId}!`).addClass('connected');
-            // Memulai game setelah koneksi TikTok berhasil
+            // [DIUBAH] Sesuaikan 'uniqueId' dari 'state' jika ada, jika tidak, ambil dari input
+            const connectedUser = state.uniqueId || window.$('#uniqueIdInput').val().trim().replace(/^@/, '');
+            window.$('#stateText').text(`Terhubung ke LIVE @${connectedUser}!`).addClass('connected');
             startNewGame(); 
         });
 
         connection.on('tiktokDisconnected', (errorMessage) => {
-            window.$('#stateText').text(`Koneksi TikTok Gagal/Terputus: ${errorMessage}. Mencoba lagi...`).removeClass('connected');
+            window.$('#stateText').text(`Koneksi TikTok Gagal/Terputus: ${errorMessage}.`).removeClass('connected');
         });
 
         connection.on('streamEnd', () => {
@@ -664,14 +649,11 @@
             clearInterval(countdownTimer);
         });
 
-        // [DIUBAH] Listener disconnect socket.io umum
         connection.on('disconnect', () => {
             window.$('#stateText').text('Koneksi ke Server Game terputus.').removeClass('connected');
         });
-
-        // [DIHAPUS] Fungsi connect() yang lama tidak diperlukan lagi
         
-        // ... (sanitize, updateRoomStats, generateUsernameLink, isPendingStreak, addChatItem) ...
+        // [TIDAK DIUBAH] Fungsi helper UI
         function sanitize(text) { return text.replace(/</g, '&lt;') }
         function updateRoomStats() { window.$('#roomStats').html(`Viewers: <b class="text-white">${viewerCount.toLocaleString()}</b> Likes: <b class="text-white">${likeCount.toLocaleString()}</b> Diamonds: <b class="text-white">${diamondsCount.toLocaleString()}</b>`) }
         function generateUsernameLink(data) { return `<a class="usernamelink" href="https://www.tiktok.com/@${data.uniqueId}" target="_blank">${data.nickname}</a>`; }
@@ -681,8 +663,7 @@
             let container = window.$('.chatcontainer');
             if (container.find('div').length > 500) { container.find('div').slice(0, 200).remove(); }
             container.find('.temporary').remove();;
-
-            container.find('.new-chat').removeClass('new-chat'); // Hapus kelas dari yang lama
+            container.find('.new-chat').removeClass('new-chat');
             
             const newChatItem = window.$(
                 `<div class="${summarize ? 'temporary' : 'static'} new-chat">
@@ -698,67 +679,82 @@
             container.stop().animate({ scrollTop: container[0].scrollHeight }, 400);
         }
         
-        // ... (Event listener koneksi TikTok: roomUser, like, member, chat, social, streamEnd) ...
+        // =================================================================
+        // [PERUBAHAN UTAMA] MENGGANTI 'tiktokBatch' DENGAN LISTENER INDIVIDUAL
+        // =================================================================
         
-        // [DIUBAH] Listener ini sekarang berfungsi karena backend baru mengirimkan batch yang sesuai
-        connection.on('tiktokBatch', (batch) => {
-            if (!Array.isArray(batch)) return; // Pastikan data adalah array
+        // [DIHAPUS] Listener tiktokBatch
+        // connection.on('tiktokBatch', (batch) => { ... });
 
-            batch.forEach(event => {
-                
-                // Siapkan data pengguna universal
-                const userData = {
-                    userId: event.userId || event.uniqueId, // Gunakan userId atau uniqueId
-                    nickname: event.nickname,
-                    profilePictureUrl: event.profilePictureUrl
-                };
+        // [BARU] Menangani update viewer dari server.js
+        connection.on('roomUser', (msg) => {
+            if (typeof msg.viewerCount === 'number') {
+                viewerCount = msg.viewerCount;
+                updateRoomStats();
+            }
+        });
 
-                if (event.type === 'guess') {
-                    const guessData = event.guess; // "WORDL"
-                    guessQueue.push({ 
-                        guess: guessData, 
-                        user: userData, 
-                        isManual: false 
-                    });
-                    processGuessQueue(); 
-                
-                } else if (event.type === 'chat') {
-                    // [BEKERJA] Menangani obrolan biasa
-                    addChatItem('', userData, event.comment); // event.comment dari server baru
+        // [BARU] Menangani member (join) dari server.js
+        connection.on('member', (msg) => {
+            const userData = { userId: msg.uniqueId, nickname: msg.nickname, profilePictureUrl: msg.profilePictureUrl };
+            addChatItem('#2dd4bf', userData, 'bergabung', true);
+        });
 
-                } else if (event.type === 'winCheck') {
-                    // [BEKERJA] Menangani perintah !win
-                    showUserWinStatus(userData.userId, userData.nickname, userData.profilePictureUrl);
+        // [BARU] Menangani like dari server.js
+        connection.on('like', (msg) => {
+            if (typeof msg.totalLikeCount === 'number') {
+                likeCount = msg.totalLikeCount;
+                updateRoomStats();
+            }
+            if (msg.likeCount > 0) {
+                const userData = { userId: msg.uniqueId, nickname: msg.nickname, profilePictureUrl: msg.profilePictureUrl };
+                addChatItem('#ec4899', userData, `${msg.likeCount} suka`);
+            }
+        });
 
-                } else if (event.type === 'like') {
-                    // [BEKERJA] Menangani like
-                    if (typeof event.totalLikeCount === 'number') {
-                        likeCount = event.totalLikeCount;
-                        updateRoomStats();
-                    }
-                    if (event.likeCount > 0) {
-                        addChatItem('#ec4899', event, `${event.likeCount} suka`);
-                    }
+        // [BARU] Menangani social (follow/share) dari server.js
+        connection.on('social', (msg) => {
+            if (msg.label) {
+                const userData = { userId: msg.uniqueId, nickname: msg.nickname, profilePictureUrl: msg.profilePictureUrl };
+                let color = msg.displayType.includes('follow') ? '#f43f5e' : '#2fb816';
+                addChatItem(color, userData, msg.label.replace('{0:user}', ''));
+            }
+        });
 
-                } else if (event.type === 'member') {
-                    // [BEKERJA] Menangani member baru
-                    addChatItem('#2dd4bf', event, 'bergabung', true);
+        // [BARU] Menangani Chat (Tebakan, !win, obrolan biasa) dari server.js
+        connection.on('chat', (msg) => {
+            const text = (msg.comment || "").trim();
+            const textUpper = text.toUpperCase();
+            // Data pengguna dari event 'chat'
+            const userData = { 
+                userId: msg.uniqueId, 
+                nickname: msg.nickname, 
+                profilePictureUrl: msg.profilePictureUrl 
+            };
 
-                } else if (event.type === 'roomUser') {
-                    // [BEKERJA] Menangani update viewer
-                    if (typeof event.viewerCount === 'number') {
-                        viewerCount = event.viewerCount;
-                        updateRoomStats();
-                    }
-                
-                } else if (event.type === 'social') {
-                    // [BEKERJA] Menangani follow/share
-                    if (event.label) {
-                        let color = event.displayType.includes('follow') ? '#f43f5e' : '#2fb816';
-                        addChatItem(color, event, event.label.replace('{0:user}', ''));
-                    }
-                }
-            });
+            if (/^!WIN$/i.test(text)) {
+                // Menangani !win
+                showUserWinStatus(userData.userId, userData.nickname, userData.profilePictureUrl);
+            
+            } else if (/^[A-Z]{5}$/.test(textUpper)) {
+                // Menangani tebakan 5 huruf
+                guessQueue.push({ 
+                    guess: textUpper, 
+                    user: userData, 
+                    isManual: false 
+                });
+                processGuessQueue(); 
+
+            } else {
+                // Menangani obrolan biasa
+                addChatItem('', userData, text);
+            }
+        });
+        
+        // [BARU] Listener statistik (opsional, tapi ada di server.js)
+        connection.on('statistic', (data) => {
+            // console.log("Statistik global:", data.globalConnectionCount);
+            // Tidak ada UI untuk ini, jadi biarkan saja
         });
         
         // [DIHAPUS] Semua listener lama (roomUser, like, member, chat, social)
@@ -768,11 +764,9 @@
         /**
          * ===============================================
          * BAGIAN 3: WORDLE (KATLA) GAME LOGIC
+         * [TIDAK ADA PERUBAHAN DI BAWAH INI]
          * ===============================================
          */
-        
-        // ... (Seluruh logika game Wordle, Firebase, dan UI tetap SAMA) ...
-        // ... (Tidak ada perubahan dari baris ini ke bawah) ...
         
         const WORD_LENGTH = 5;
         const GAME_DURATION = 300; 
@@ -825,9 +819,6 @@
                 if (data.forceSkip > lastSkipTime) {
                     lastSkipTime = data.forceSkip;
                     
-                    // [DIUBAH] forceSkip sekarang bisa 2 fungsi:
-                    // 1. Lewati game yang sedang berjalan
-                    // 2. Lanjutkan dari layar definisi
                     if (isWaitingForNextGame) {
                         console.log("Admin skip detected during definition. Proceeding to next game.");
                         proceedToNextGame();
@@ -1033,10 +1024,8 @@
             
             showModal(definitionTitle, definitionContent);
             
-            // [BARU] Set status jeda (untuk tombol admin)
             isWaitingForNextGame = true;
 
-            // [BARU] Jeda 10 detik lalu lanjut otomatis
             setTimeout(proceedToNextGame, 10000); 
         }
 
@@ -1047,7 +1036,6 @@
             
             window.$('#infoModal').addClass('hidden');
             
-            // 3. Tampilkan Overlay Peringkat
             showRankUpdateOverlay(); 
             
             await new Promise(resolve => setTimeout(resolve, 5000));
@@ -1055,7 +1043,6 @@
 
             isProcessingGuess = false;
 
-            // 4. Mulai Game Baru
             window.$('#wordle-message').html(`<span class="text-gray-400">Memulai ronde berikutnya...</span>`);
             setTimeout(startNewGame, 1000);
         }
@@ -1146,25 +1133,20 @@
                 const overlay = window.$('#winnerCelebrationOverlay');
                 const card = window.$('#winnerCelebrationCard');
 
-                // 1. Reset
                 overlay.removeClass('visible');
                 
-                // 2. Isi konten
                 overlay.find('#celebration-pfp')
                        .attr('src', user.profilePictureUrl || 'https://placehold.co/128x128/374151/9ca3af?text=?')
                        .on('error', function() { this.src='https://placehold.co/128x128/374151/9ca3af?text=?'; });
                 overlay.find('#celebration-name').text(user.nickname);
                 overlay.find('#celebration-rank').text(rankText);
                 
-                // 3. Tampilkan overlay dan picu animasi
                 overlay.addClass('visible');
 
-                // 4. Sembunyikan setelah 4 detik
                 setTimeout(() => {
                     overlay.removeClass('visible');
-                    // Selesaikan promise SETELAH animasi fade-out selesai
-                    setTimeout(resolve, 300); // 300ms = durasi 'celebrationFadeIn'
-                }, 4000); // Tampilkan selama 4 detik
+                    setTimeout(resolve, 300); 
+                }, 4000); 
             });
         }
 
@@ -1248,7 +1230,7 @@
             }
 
             for (let i = 0; i < WORD_LENGTH; i++) {
-                await new Promise(resolve => setTimeout(resolve, 100)); /* [DIUBAH] 250 -> 100 */
+                await new Promise(resolve => setTimeout(resolve, 100)); 
                 const tile = window.$(currentTiles[i]);
                 tile.addClass('flip').find('.back').parent().addClass(letterClasses[i]);
             }
@@ -1263,25 +1245,24 @@
                     const winnerRank = winnerListThisRound.length + 1;
                     let pointsToAdd = 0;
                     let rankText = "";
-                    let celebrationText = ""; // [BARU] Teks untuk overlay
+                    let celebrationText = ""; 
 
-                    // [DIUBAH] Hanya pemenang 1 yang dapat poin
                     if (winnerRank === 1) {
                         pointsToAdd = 3;
                         rankText = "Pemenang ke-1 (+3 Poin)";
-                        celebrationText = "TEBAKAN TEPAT!"; // [DIUBAH] Teks perayaan lebih simpel
+                        celebrationText = "TEBAKAN TEPAT!"; 
                     } else if (winnerRank === 2) {
-                        pointsToAdd = 0; // [DIUBAH]
-                        rankText = "Pemenang ke-2 (0 Poin)"; // [DIUBAH]
-                        celebrationText = "Tebakan Tepat!"; // [BARU]
+                        pointsToAdd = 0; 
+                        rankText = "Pemenang ke-2 (0 Poin)"; 
+                        celebrationText = "Tebakan Tepat!"; 
                     } else if (winnerRank === 3) {
-                        pointsToAdd = 0; // [DIUBAH]
-                        rankText = "Pemenang ke-3 (0 Poin)"; // [DIUBAH]
-                        celebrationText = "Tebakan Tepat!"; // [BARU]
+                        pointsToAdd = 0; 
+                        rankText = "Pemenang ke-3 (0 Poin)"; 
+                        celebrationText = "Tebakan Tepat!"; 
                     } else {
                         pointsToAdd = 0;
                         rankText = `Pemenang ke-${winnerRank} (0 Poin)`;
-                        celebrationText = "Tebakan Tepat!"; // [BARU]
+                        celebrationText = "Tebakan Tepat!"; 
                     }
 
                     winnerListThisRound.push({
@@ -1295,10 +1276,9 @@
                         updateGlobalScore(userId, userData.nickname, userData.profilePictureUrl, pointsToAdd);
                     }
                     
-                    isProcessingGuess = true; // Jeda antrian selagi perayaan
-                    await showWinnerCelebration(userData, celebrationText); // [DIUBAH] Menggunakan celebrationText
+                    isProcessingGuess = true; 
+                    await showWinnerCelebration(userData, celebrationText); 
 
-                    // [PERUBAHAN] Jika ini pemenang PERTAMA, hentikan permainan
                     if (winnerRank === 1) {
                         console.log("First winner found. Triggering end game sequence.");
                         triggerEndGameSequence();
@@ -1309,8 +1289,7 @@
                     processGuessQueue(); 
 
                 } else if (isManualGuess) {
-                    // [DIUBAH] Tampilkan perayaan untuk tebakan manual
-                    isProcessingGuess = true; // Jeda antrian selagi perayaan
+                    isProcessingGuess = true; 
                     await showWinnerCelebration(userData, "Tebakan Manual Berhasil!");
 
                     if (!winnerListThisRound.find(w => w.isManual && w.nickname === userData.nickname)) {
@@ -1420,5 +1399,3 @@
     </script>
 </body>
 </html>
-
-
