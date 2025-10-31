@@ -25,9 +25,16 @@
             background: linear-gradient(-45deg, #111827, #1f2937, #111827, #374151);
             background-size: 400% 400%;
             animation: animateBackground 15s ease infinite;
-            overscroll-behavior-y: none; /* [BARU] Mencegah pull-to-refresh di mobile */
         }
         /* ... (scrollbar styles) ... */
+        /* Sembunyikan scrollbar default di body, tapi biarkan bisa scroll */
+        body::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+        body {
+            -ms-overflow-style: none;  /* IE/Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
         
         .miniprofilepicture { width: 32px; height: 32px; border-radius: 50%; margin-right: 10px; vertical-align: middle; border: 2px solid #374151; }
         .usernamelink { color: #2dd4bf; text-decoration: none; font-weight: 500; }
@@ -35,16 +42,20 @@
         .chatcontainer > div, #leaderboard-container > div { background-color: rgba(31, 41, 55, 0.5); padding: 10px 12px; border-radius: 12px; margin-bottom: 8px; display: flex; align-items: center; font-size: 0.9rem; line-height: 1.4; transition: all 0.2s ease-in-out; }
         .chatcontainer > div:hover, #leaderboard-container > div:hover { background-color: rgba(55, 65, 81, 0.7); }
         
-        /* ... (Animasi slideInFromRight tetap) ... */
+        /* [BARU] Animasi untuk pesan chat baru */
         @keyframes slideInFromRight {
-            from { opacity: 0; transform: translateX(100%); }
-            to { opacity: 1; transform: translateX(0); }
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
-        .chatcontainer > div.new-chat { animation: slideInFromRight 0.3s ease-out; }
 
-        /* [BARU] Kontrol scroll untuk chat/leaderboard di mobile */
-        .chatcontainer, #leaderboard-container {
-             overscroll-behavior-y: contain;
+        .chatcontainer > div.new-chat {
+            animation: slideInFromRight 0.3s ease-out;
         }
 
         #leaderboard-container > div { justify-content: space-between; }
@@ -58,57 +69,51 @@
             height: 400px; /* Tinggi tetap agar bisa scroll */
             overflow-y: scroll;
             scroll-behavior: smooth;
-            padding: 10px 4px; /* [DIUBAH] Kurangi padding horizontal untuk mobile */
+            padding: 10px;
             background-color: rgba(0,0,0,0.2);
             border-radius: 8px;
             border: 1px solid #374151;
-            overscroll-behavior-y: contain; /* [BARU] Mencegah scroll 'mental' */
+            /* [BARU] Sembunyikan scrollbar tapi tetap bisa scroll */
+            -ms-overflow-style: none;  /* IE dan Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        #wordle-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari */
         }
         
         /* ... (Styling wordle-row-container dan tile tetap sama) ... */
         .wordle-row-container {
             display: grid;
-            /* [DIUBAH] Layout mobile-first yang lebih sempit */
-            grid-template-columns: 40px 1fr 50px; 
+            grid-template-columns: 52px 1fr 64px; /* PFP, Grid, Name */
             align-items: center;
-            gap: 8px; /* [DIUBAH] Kurangi gap */
+            gap: 12px;
             margin-bottom: 8px;
             max-width: 500px;
             margin-left: auto;
             margin-right: auto;
         }
         .guesser-pfp {
-             /* [DIUBAH] Ukuran PFP mobile-first */
-            width: 40px; height: 40px;
-            border-radius: 8px; /* [DIUBAH] */
+            width: 52px; height: 52px;
+            border-radius: 10px;
             background-color: #374151;
             border: 2px solid #4b5563;
             object-fit: cover;
             transition: all 0.3s ease;
         }
-        
-        /* [DIUBAH] Styling untuk nama & inisial */
         .guesser-name {
-            color: #e5e7eb; /* [DIUBAH] Ganti ke warna putih (gray-200) */
-            line-height: 1.2;
+            font-size: 0.75rem; /* 12px */
+            font-weight: 600;
+            color: #9ca3af; /* gray-400 */
+            line-height: 1.3;
             word-break: break-all;
             text-align: left;
         }
-        .guesser-name .full-name {
-            display: none; /* Sembunyikan nama lengkap di mobile */
-        }
-        .guesser-name .initials {
-            display: inline; /* Tampilkan inisial di mobile */
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-        
         .guesser-name.manual, .guesser-pfp.manual {
             border-color: #67e8f9; /* Sorot tebakan manual admin */
         }
         .guesser-chances {
             display: block; /* Agar di bawah nickname */
-            font-size: 0.65rem; /* [DIUBAH] Kecilkan lagi */
+            font-size: 0.7rem; /* 11px, lebih kecil */
             font-weight: 500;
             color: #f59e0b; /* Warna oranye/kuning */
             text-align: left;
@@ -122,15 +127,17 @@
         }
         .wordle-grid-row {
             display: grid;
-            grid-gap: 4px; /* [DIUBAH] Rapatkan gap tile */
-            /* [DIHAPUS] max-width: 350px; Biarkan 100% dari kolom 1fr */
+            grid-gap: 5px;
+            max-width: 350px;
         }
         .tile { 
-            position: relative; 
+            position: relative; /* [DITAMBAH] Ini adalah jangkar untuk .front/.back */
             width: 100%; 
-            /* [DIHAPUS] display: inline-flex; ... */
-            /* [DIUBAH] Ukuran font responsif (viewport width) */
-            font-size: 6vw; 
+            /* [DIHAPUS] Properti flex ini tidak memengaruhi anak 'absolute' */
+            /* display: inline-flex; */
+            /* justify-content: center; */
+            /* align-items: center; */
+            font-size: 1.8rem; /* [DIUBAH] Sedikit lebih kecil dari 2rem */
             line-height: 1; 
             font-weight: 800; 
             vertical-align: middle; 
@@ -138,14 +145,14 @@
             color: #fff; 
             text-transform: uppercase; 
             user-select: none; 
-            border: 1px solid #374151; /* [DIUBAH] Border lebih tipis */
-            border-radius: 6px; /* [DIUBAH] */
+            border: 2px solid #374151; 
+            border-radius: 8px; 
             background-color: #111827; 
             transition: transform 0.3s, background-color 0.3s, border-color 0.3s; 
             transform-style: preserve-3d; 
             aspect-ratio: 1 / 1; 
         } 
-        .tile::before { display: none; } 
+        .tile::before { display: none; } /* [DIUBAH] Hack padding-bottom dinonaktifkan */
         .tile.filled { border-color: #4b5563; }
         .tile.flip { transform: rotateX(180deg); }
         .tile .front, .tile .back { 
@@ -154,6 +161,7 @@
             z-index: 2; 
             transform: rotateX(0deg); 
             
+            /* [BARU] Ini cara yang benar untuk memusatkan huruf di dalam ubin */
             width: 100%;
             height: 100%;
             display: flex;
@@ -174,7 +182,6 @@
             max-width: 200px;
             margin: 0 auto 15px auto;
         }
-        /* ... (mini-tile styles) ... */
         .mini-tile {
             width: 100%;
             aspect-ratio: 1 / 1;
@@ -191,11 +198,9 @@
         .mini-tile.present { background-color: #f59e0b; border-color: #f59e0b; }
         .mini-tile.absent { background-color: #374151; border-color: #374151; }
 
-        /* ... (loader styles) ... */
         .loader { width: 24px; height: 24px; border: 3px solid #67e8f9; border-bottom-color: transparent; border-radius: 50%; display: inline-block; box-sizing: border-box; animation: rotation 1s linear infinite; }
         @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* ... (modal styles) ... */
         #infoModal { animation: modalFadeIn 0.3s ease-out; }
         @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         .modal-content-winner {
@@ -208,33 +213,40 @@
             -webkit-text-fill-color: transparent;
         }
         
-        /* ... (timer styles) ... */
+        /* [BARU] Animasi untuk timer rendah & status terhubung */
         @keyframes pulseRed {
             0% { transform: scale(1); color: #f87171; /* red-400 */ }
             50% { transform: scale(1.05); color: #ef4444; /* red-500 */ }
             100% { transform: scale(1); color: #f87171; /* red-400 */ }
         }
-        .timer-low { animation: pulseRed 1s ease-in-out infinite; }
+
+        .timer-low {
+            animation: pulseRed 1s ease-in-out infinite;
+        }
 
         @keyframes pulseGreen {
             0% { color: #86efac; /* green-300 */ }
             50% { color: #4ade80; /* green-400 */ }
             100% { color: #86efac; /* green-300 */ }
         }
-        #stateText.connected { animation: pulseGreen 1.5s ease-in-out infinite; }
 
-        /* ... (gradient text styles) ... */
+        #stateText.connected {
+            animation: pulseGreen 1.5s ease-in-out infinite;
+        }
+
+        /* [BARU] Animasi untuk gradien teks header */
         @keyframes animateTextGradient {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+
         .animated-gradient-text {
             background-size: 200% 200%;
             animation: animateTextGradient 5s ease infinite;
         }
 
-        /* ... (modal winner, rank styles) ... */
+        /* ... (Styling modal winner, rank, !win status tetap sama) ... */
         .session-winner-list {
             display: flex;
             flex-direction: column;
@@ -272,92 +284,58 @@
         .rank-item.rank-1 .rank-num { color: #f59e0b; }
         .rank-item.rank-2 .rank-num { color: #d1d5db; }
         .rank-item.rank-3 .rank-num { color: #a16207; }
-        
-        /* [DIUBAH] Styling untuk overlay !win */
-        #userWinStatusOverlay {
-            position: fixed;
-            top: 16rem; /* Pindahkan ke atas, kira-kira di atas timer */
-            left: 50%;
-            transform: translateX(-50%);
-            /* [DIHAPUS] width: 90%; */
-            /* [DIHAPUS] max-width: 300px; */
-            /* [DIHAPUS] background-color: rgba(31, 41, 55, 0.95); */
-            color: white;
-            /* [DIHAPUS] padding: 1rem; */
-            /* [DIHAPUS] border-radius: 0.75rem; */
-            /* [DIHAPUS] box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); */
-            z-index: 50;
-            transition: all 0.3s ease;
-            display: none; /* Sembunyikan by default */
-            /* [DIHAPUS] border: 1px solid #06b6d4; */
-            text-align: center;
-            pointer-events: none; /* [BARU] Agar bisa diklik tembus */
-            text-shadow: 0px 0px 8px rgba(0, 0, 0, 0.9); /* [BARU] Tambahkan shadow untuk keterbacaan */
-        }
-        #userWinStatusOverlay.visible {
-            display: block; /* Kelas untuk memunculkan */
-        }
-        .win-status-pfp { 
-            display: none; /* [DIUBAH] Sembunyikan PFP agar tidak mengganggu */
-            /*
-            width: 64px; height: 64px; 
-            border-radius: 50%; 
-            margin: 0 auto 12px auto; 
-            border: 3px solid #06b6d4; 
-            */
-        }
-        .win-status-name { 
-            font-size: 1.5rem; /* [DIUBAH] Sedikit perbesar */
-            font-weight: 700; color: #fff; 
-        }
-        .win-status-score { 
-            font-size: 0.9rem; /* Sesuaikan dari 1.1rem */
-            color: #e5e7eb; 
-            margin-top: 4px; 
-        }
-        .win-status-rank { 
-            font-size: 0.9rem; /* Sesuaikan dari 1.1rem */
-            color: #e5e7eb; 
-        }
+        .win-status-pfp { width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 12px auto; border: 4px solid #06b6d4; }
+        .win-status-name { font-size: 1.5rem; font-weight: 700; color: #fff; }
+        .win-status-score { font-size: 1.1rem; color: #e5e7eb; margin-top: 4px; }
+        .win-status-rank { font-size: 1.1rem; color: #e5e7eb; }
 
-
-        /* ... (tab button styles) ... */
+        /* [BARU] Style untuk Tombol Tab */
         .tab-button {
-            display: inline-flex; 
+            display: inline-flex; /* Agar ikon dan teks sejajar */
             align-items: center;
-            gap: 0.5rem; 
-            padding: 0.75rem 1rem; 
+            gap: 0.5rem; /* 8px */
+            padding: 0.75rem 1rem; /* 12px 16px */
             font-weight: 600;
-            font-size: 0.9rem; 
-            border-radius: 0.5rem 0.5rem 0 0; 
+            font-size: 0.9rem; /* Sedikit lebih kecil agar muat di mobile */
+            border-radius: 0.5rem 0.5rem 0 0; /* Hanya sudut atas yang rounded */
             border: 1px solid transparent;
             cursor: pointer;
             transition: all 0.3s ease;
             white-space: nowrap;
         }
+        /* Style untuk Tombol Aktif */
         .tab-button.active {
-            background-color: #06b6d4; 
+            background-color: #06b6d4; /* cyan-600 */
             color: white;
-            border-color: #0891b2; 
+            border-color: #0891b2; /* cyan-700 */
         }
+        /* Style untuk Tombol Tidak Aktif */
         .tab-button.inactive {
-            background-color: rgba(55, 65, 81, 0.5); 
-            color: #d1d5db; 
+            background-color: rgba(55, 65, 81, 0.5); /* gray-700/50 */
+            color: #d1d5db; /* gray-300 */
             border-color: transparent;
         }
+        /* Hover state untuk Tombol Tidak Aktif */
         .tab-button.inactive:hover {
-            background-color: rgba(75, 85, 99, 0.7); 
+            background-color: rgba(75, 85, 99, 0.7); /* gray-600/70 */
             color: white;
         }
 
-        /* ... (tab panel height styles) ... */
+        /* [BARU] Pastikan panel chat dan leaderboard punya tinggi yg sama di tab */
         #chat-panel-container, #leaderboard-panel-container {
             height: 400px;
             display: flex;
             flex-direction: column;
+            /* [BARU] Sembunyikan scrollbar tapi tetap bisa scroll */
+            -ms-overflow-style: none;  /* IE dan Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        #chat-panel-container::-webkit-scrollbar,
+        #leaderboard-panel-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari */
         }
 
-        /* ... (winner celebration styles) ... */
+        /* [BARU] CSS untuk Animasi Pemenang */
         @keyframes celebrationFadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -367,78 +345,129 @@
             80% { transform: scale(1.05); opacity: 1; }
             100% { transform: scale(1) translateY(0); opacity: 1; }
         }
+
         #winnerCelebrationOverlay {
-            display: none; 
+            display: none; /* Diubah oleh JS ke flex */
             opacity: 0;
             background-color: rgba(0, 0, 0, 0.7);
+            /* Efek spotlight */
             background-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.8) 100%);
         }
+
         #winnerCelebrationOverlay.visible {
             display: flex;
             animation: celebrationFadeIn 0.3s ease-out forwards;
         }
+
         #winnerCelebrationCard {
-            opacity: 0; 
+            opacity: 0; /* Mulai transparan */
             transform: scale(0.7);
             will-change: transform, opacity;
             background: linear-gradient(145deg, #1f2937, #374151);
             border-width: 2px;
             box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1), 0 0 30px 0px rgba(6, 182, 212, 0.4);
         }
+
         #winnerCelebrationOverlay.visible #winnerCelebrationCard {
+            /* Memicu animasi pop-in */
             animation: celebrationPopIn 0.5s cubic-bezier(0.21, 1.02, 0.73, 1) 0.1s forwards;
         }
 
-        /* [BARU] Media Query untuk layar lebih besar (Tablet/Desktop) */
-        @media (min-width: 450px) {
-            .tile {
-                font-size: 1.8rem; /* Kembalikan font-size jika layar > 450px */
-            }
+        /* [BARU] Efek Peringkat PFP (Emas, Perak, Perunggu) */
+        .guesser-pfp, .leaderboard-pfp, .rank-pfp {
+            transition: all 0.3s ease; /* Pastikan transisi ada untuk semua PFP */
+        }
+        
+        .rank-1-pfp,
+        .leaderboard-pfp.rank-1,
+        .rank-pfp.rank-1 {
+            border-width: 3px;
+            border-color: #f59e0b; /* yellow-500 */
+            box-shadow: 0 0 12px 3px rgba(245, 158, 11, 0.7); /* Efek glow kuning */
+        }
+        
+        .rank-2-pfp,
+        .leaderboard-pfp.rank-2,
+        .rank-pfp.rank-2 {
+            border-width: 3px;
+            border-color: #d1d5db; /* gray-300 */
+            box-shadow: 0 0 12px 3px rgba(209, 213, 219, 0.6); /* Efek glow perak */
         }
 
-        @media (min-width: 640px) {
-             .wordle-row-container {
-                /* Kembalikan layout original di layar sm+ */
-                grid-template-columns: 52px 1fr 64px;
-                gap: 12px;
-            }
-            .guesser-pfp {
-                width: 52px; height: 52px;
-                border-radius: 10px;
-            }
-            
-            /* [DIUBAH] Tampilkan nama lengkap di desktop, sembunyikan inisial */
-            .guesser-name .full-name {
-                display: inline;
-            }
-            .guesser-name .initials {
-                display: none;
-            }
-            .guesser-name {
-                font-size: 0.75rem; /* 12px */
-                line-height: 1.3;
-                color: #e5e7eb; /* Pastikan warna tetap putih */
-            }
-            
-            .guesser-chances {
-                 font-size: 0.7rem; /* 11px */
-            }
-            .wordle-grid-row {
-                grid-gap: 5px; /* Kembalikan gap original */
-            }
-            .tile {
-                border-width: 2px;
-                border-radius: 8px;
-            }
-            #wordle-container {
-                 padding: 10px; /* Kembalikan padding original */
-            }
+        .rank-3-pfp,
+        .leaderboard-pfp.rank-3,
+        .rank-pfp.rank-3 {
+            border-width: 3px;
+            border-color: #a16207; /* yellow-700 */
+            box-shadow: 0 0 12px 3px rgba(161, 98, 7, 0.6); /* Efek glow perunggu */
+        }
+
+        /* [BARU] CSS untuk Marquee Top Gifter */
+        .marquee-container {
+            display: flex;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border: 1px solid #374151;
+            padding: 8px 12px;
+            overflow: hidden; /* Penting untuk marquee */
+            margin-top: 16px; /* Jarak dari kotak tebakan */
+        }
+        .marquee-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #f59e0b; /* Kuning */
+            text-transform: uppercase;
+            padding-right: 12px;
+            border-right: 2px solid #374151;
+            white-space: nowrap;
+        }
+        .marquee-scroll {
+            flex-grow: 1;
+            overflow: hidden;
+            position: relative;
+            height: 32px; /* Sesuaikan dengan tinggi PFP */
+        }
+        .marquee-content {
+            display: flex;
+            position: absolute;
+            white-space: nowrap;
+            animation: marquee-scroll 60s linear infinite;
+            will-change: transform;
+        }
+        .marquee-item {
+            display: flex;
+            align-items: center;
+            margin-left: 24px;
+        }
+        .marquee-pfp {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid #4b5563;
+        }
+        .marquee-name {
+            font-weight: 600;
+            color: #e5e7eb;
+            font-size: 0.9rem;
+        }
+        .marquee-diamonds {
+            font-weight: 700;
+            color: #facc15; /* Emas muda */
+            font-size: 0.9rem;
+            margin-left: 6px;
+        }
+
+        @keyframes marquee-scroll {
+            from { transform: translateX(0); }
+            to { transform: translateX(-100%); }
         }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200 flex items-center justify-center min-h-screen p-4">
 
-    <!-- [TIDAK DIUBAH] Seluruh Konten dibungkus dalam div ini -->
+    <!-- [DIUBAH] Seluruh Konten dibungkus dalam div ini -->
     <div class="w-full max-w-6xl mx-auto bg-gray-800/60 rounded-2xl shadow-2xl shadow-black/30 p-4 sm:p-6 md:p-8 space-y-6 backdrop-blur-sm border border-gray-700/50">
         
         <header class="text-center border-b border-gray-700 pb-4">
@@ -450,17 +479,60 @@
             </p>
         </header>
 
-        <!-- [TIDAK DIUBAH] Kotak Koneksi disesuaikan untuk server-railway-compatible.js -->
+        <!-- Kotak Koneksi -->
         <div class="bg-gray-900/50 p-6 rounded-xl border border-gray-700/50">
             <div class="space-y-4">
-                <input id="uniqueIdInput" type="text" placeholder="Masukkan @username TikTok Anda" class="w-full bg-gray-700 border border-gray-600 text-white placeholder-gray-400 text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block p-3" required>
+                <!-- [DIHAPUS] Input Username TikTok -->
+                <!-- [DIHAPUS] Input Session ID -->
                 <button id="connectButton" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-cyan-500 shadow-lg shadow-cyan-500/20">
-                    Hubungkan ke LIVE
+                    Hubungkan ke Server Game
+                </button>
+                
+                <!-- [BARU] Tombol Mode Simulasi -->
+                <button id="simToggleButton" class="w-full mt-2 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-yellow-500 shadow-lg shadow-yellow-500/20">
+                    Aktifkan Mode Simulasi
                 </button>
             </div>
+            
+            <!-- [BARU] Panel Simulasi (disembunyikan secara default) -->
+            <div id="simPanel" class="hidden bg-gray-700/50 p-4 rounded-xl border border-yellow-500/50 mt-4 space-y-3">
+                <h3 class="font-semibold text-white text-center text-yellow-300">Panel Simulasi</h3>
+                <div>
+                    <label for="simName" class="block text-sm font-medium text-gray-300 mb-1">Nama Panggilan (Test)</label>
+                    <input type="text" id="simName" value="Simulator" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                </div>
+                <div>
+                    <label for="simGuess" class="block text-sm font-medium text-gray-300 mb-1">Tebakan (5 Huruf)</label>
+                    <input type="text" id="simGuess" maxlength="5" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 uppercase tracking-widest text-center font-bold text-lg">
+                </div>
+                <!-- [BARU] Grup untuk simulasi gift -->
+                <div class="flex gap-3">
+                    <div class="w-1/2">
+                        <label for="simGiftName" class="block text-sm font-medium text-gray-300 mb-1">Nama Hadiah</label>
+                        <input type="text" id="simGiftName" value="Mawar" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    </div>
+                    <div class="w-1/2">
+                        <label for="simDiamonds" class="block text-sm font-medium text-gray-300 mb-1">Koin</label>
+                        <input type="number" id="simDiamonds" value="1" min="1" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button id="simGuessButton" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-700 focus:ring-green-500">
+                        Simulasikan Tebakan
+                    </button>
+                    <button id="simWinButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-700 focus:ring-blue-500">
+                        Simulasikan !win
+                    </button>
+                    <!-- [BARU] Tombol Gift -->
+                    <button id="simGiftButton" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-700 focus:ring-yellow-500">
+                        Simulasikan Hadiah
+                    </button>
+                </div>
+            </div>
+
         </div>
 
-        <!-- [TIDAK DIUBAH] Kotak Status & Stats -->
+        <!-- Kotak Status & Stats (Tetap Sama) -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-gray-700/50 rounded-xl p-4 min-h-[100px] flex flex-col justify-center items-center border border-gray-700/50">
                 <h3 class="font-semibold text-white mb-2 text-center">Status Koneksi</h3>
@@ -472,7 +544,7 @@
             </div>
         </div>
 
-        <!-- [TIDAK DIUBAH] Navigasi Tab -->
+        <!-- [BARU] Navigasi Tab -->
         <div class="border-b border-gray-700">
             <div class="flex flex-wrap -mb-px gap-2">
                 <!-- Tombol Tab Permainan (Aktif by default) -->
@@ -495,30 +567,28 @@
                 <button class="tab-button inactive" data-tab="leaderboard">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M8 0l1.669.864 1.858.282.842 1.68.56.932 1.767.437 1.06 1.528.23 1.834-1.218.875-1.071 1.528-.4 1.76-.932.56-1.68.842-.282 1.858L8 16l-1.669-.864-1.858-.282-.842-1.68-.56-.932-1.767-.437-1.06-1.528-.23-1.834 1.218.875 1.071 1.528.4-1.76.932.56 1.68-.842.282-1.858L8 0z"/>
-                        <path d="M4 11.794V12a4 4 0 0 0 .813 2.126L5.305 15.16v.63C5.181 15.903 5 15.95 5 16h6c0-.05-.181-.097-.305-.11v-.63l.492-1.034A4 4 0 0 0 12 12v-.206c-.05.01-.1.018-.15.025v.input.8a3 3 0 0 1-1 1.706l-.493 1.033H5.642l-.493-1.033A3 3 0 0 1 4 12.006v-.18c-.05-.007-.1-.015-.15-.025z"/>
+                        <path d="M4 11.794V12a4 4 0 0 0 .813 2.126L5.305 15.16v.63C5.181 15.903 5 15.95 5 16h6c0-.05-.181-.097-.305-.11v-.63l.492-1.034A4 4 0 0 0 12 12v-.206c-.05.01-.1.018-.15.025v.18a3 3 0 0 1-1 1.706l-.493 1.033H5.642l-.493-1.033A3 3 0 0 1 4 12.006v-.18c-.05-.007-.1-.015-.15-.025z"/>
                     </svg>
                     Peringkat
                 </button>
             </div>
         </div>
 
-        <!-- [TIDAK DIUBAH] Kontainer Konten Tab -->
+        <!-- [BARU] Kontainer Konten Tab -->
         <div>
             <!-- Panel Permainan (Aktif by default) -->
             <div id="game-panel" class="tab-content">
-                <!-- [DIUBAH] Padding p-4 -> p-2 di mobile untuk mengurangi space -->
-                <div class="bg-gray-900/50 p-2 sm:p-6 rounded-xl border border-gray-700/50">
+                <div class="bg-gray-900/50 p-4 sm:p-6 rounded-xl border border-gray-700/50">
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
                         <div class="text-left">
-                            <h2 class="text-2xl font-bold text-white mb-1">Papan Permainan</h2>
+                            <h2 class="text-2xl font-bold text-white mb-1">TEBAK KATA</h2>
                         </div>
                         <div id="timer-display" class="text-4xl font-extrabold text-pink-400 my-4 sm:my-0">05:00</div>
                         <button id="newGameButton" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-5 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-pink-500 shadow-lg shadow-pink-500/20">
                             Game Baru (Manual)
                         </button>
                     </div>
-                    <!-- [DIUBAH] Warna font text-cyan-300 -> text-gray-200 (putih) -->
-                    <p class="text-center text-gray-200 mb-2 text-sm font-medium">Ketik <b>!win</b> untuk cek poin & peringkatmu. Tebakan 5 huruf akan masuk grid.</p>
+                    <p class="text-center text-cyan-300 mb-2 text-sm font-medium">Ketik <b>!win</b> untuk cek poin & peringkatmu. Tebakan 5 huruf akan masuk grid.</p>
                     <p class="text-center text-gray-400 text-sm mb-2">Petunjuk (Tebakan Terbaik Sejauh Ini):</p>
                     <div id="best-guess-container" class="min-h-[40px]">
                         <!-- Tebakan terbaik akan muncul di sini -->
@@ -526,6 +596,20 @@
                     <div id="wordle-container">
                         <!-- Baris tebakan akan ditambahkan oleh JS -->
                     </div>
+                    
+                    <!-- [BARU] Marquee Top Gifter -->
+                    <div id="gifter-marquee" class="marquee-container hidden">
+                        <div class="marquee-title">Top Gifter</div>
+                        <div class="marquee-scroll">
+                            <div id="gifter-marquee-content" class="marquee-content">
+                                <!-- Item gifter akan ditambahkan oleh JS -->
+                                <div class="marquee-item">
+                                    <span class="marquee-name text-gray-400">Belum ada gifter di ronde ini...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="wordle-message" class="text-center text-lg font-medium mt-4 h-8 flex items-center justify-center gap-2">
                     </div>
                 </div>
@@ -550,9 +634,11 @@
             </div>
         </div>
 
+        <!-- [DIHAPUS] Grid 2 kolom untuk chat & leaderboard dihilangkan -->
+        <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-6"> ... </div> -->
     </div>
     
-    <!-- [TIDAK DIUBAH] Modal, Toast, dan Overlay lainnya -->
+    <!-- ... (Modal, Toast, dan Overlay lainnya tetap sama) ... -->
     <div id="infoModal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 hidden backdrop-blur-sm">
         <div class="bg-gray-800 rounded-2xl shadow-xl w-full max-w-md border border-gray-700 modal-content-winner">
             <div class="p-6">
@@ -573,22 +659,19 @@
             <!-- Peringkat dimuat di sini -->
         </div>
     </div>
-    
-    <!-- [DIUBAH] Hapus kelas Tailwind dari overlay !win, akan di-style oleh CSS di <head> -->
-    <div id="userWinStatusOverlay">
-        <!-- [DIHAPUS] Hapus H3 "Status Poin" agar lebih minimalis -->
-        <!-- <h3 class="text-lg font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-500">Status Poin</h3> -->
+    <div id="userWinStatusOverlay" class="fixed bottom-5 left-5 bg-gradient-to-br from-gray-800 to-gray-900 bg-opacity-90 backdrop-blur-md text-white p-4 rounded-lg shadow-2xl z-50 transition-all duration-300 hidden border border-cyan-500/50 max-w-xs w-full text-center">
+        <h3 class="text-lg font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-500">Status Poin</h3>
         <div id="userWinStatusContent">
             <!-- Status dimuat di sini -->
         </div>
     </div>
 
-    <!-- [TIDAK DIUBAH] Overlay Perayaan Pemenang -->
+    <!-- [BARU] Overlay Perayaan Pemenang -->
     <div id="winnerCelebrationOverlay" class="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
         <div id="winnerCelebrationCard" class="w-full max-w-md rounded-2xl border-cyan-400 p-8 text-center">
             <p id="celebration-title" class="text-3xl font-bold text-yellow-400 uppercase tracking-wider">BERHASIL!</p>
             <img id="celebration-pfp" src="https://placehold.co/128x128/374151/9ca3af?text=?" 
-                 class="w-32 h-32 rounded-full border-4 border-yellow-400 mx-auto my-6 shadow-lg" 
+                 class="w-32 h-32 rounded-full border-4 border-cyan-400 mx-auto my-6 shadow-lg" 
                  onerror="this.src='https://placehold.co/128x128/374151/9ca3af?text=?';">
             <h2 id="celebration-name" class="text-4xl font-extrabold text-white break-words">
                 Nickname Penebak
@@ -602,7 +685,7 @@
 
     <!-- Script Module -->
     <script type="module">
-        // [TIDAK DIUBAH] Import fungsi Firebase
+        // Import fungsi Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
         import { 
@@ -618,10 +701,10 @@
             setDoc,
             orderBy,
             limit,
-            increment
+            increment // [BARU] Import increment
         } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-        // [TIDAK DIUBAH] Firebase Config
+        // ... (Firebase Config) ...
         const firebaseConfig = {
             apiKey: "AIzaSyBmkg2rZNL0D_lpF2QMZmgle4ASTrIT_r0",
             authDomain: "kuis-tiktok-c9272.firebaseapp.com",
@@ -632,13 +715,15 @@
             measurementId: "G-EPXM197FME"
         };
 
-        // [TIDAK DIUBAH] Inisialisasi Firebase
+        // Inisialisasi Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
         signInAnonymously(auth).catch((error) => console.error("Anonymous sign-in failed:", error));
 
+        // [DIHAPUS] Kelas TikTokIOConnection tidak lagi diperlukan
+        // class TikTokIOConnection { ... }
 
         /**
          * ===============================================
@@ -646,9 +731,11 @@
          * ===============================================
          */
          
-        // [TIDAK DIUBAH] URL Backend (Harap isi manual jika perlu)
-        let backendUrl = "https://tiktok-server-production-e573.up.railway.app"; 
-        let connection = io(backendUrl, { autoConnect: false }); 
+        // [DIUBAH] Hapus URL backend statis
+        // let backendUrl = "http://localhost:3000"; 
+        
+        // [DIUBAH] Inisialisasi koneksi tanpa URL, jangan hubungkan otomatis
+        let connection = io({ autoConnect: false }); 
 
         let viewerCount = 0;
         let likeCount = 0;
@@ -657,106 +744,236 @@
 
         if (!window.settings) window.settings = {};
 
-        // [TIDAK DIUBAH] Document Ready
-        window.$(document).ready(() => {
-            
+        $(document).ready(() => {
+            // ... (init checks) ...
             if (!db) {
                 console.error("Firebase DB failed to initialize.");
                 showModal("Error Kritis", "<p>Koneksi database gagal. Harap refresh halaman.</p>");
                 return; 
             } 
 
-            // [TIDAK DIUBAH] Logika tombol Connect
-            window.$('#connectButton').text('Hubungkan ke LIVE').click(function() {
-                const uniqueId = window.$('#uniqueIdInput').val().trim().replace(/^@/, '');
-                if (!uniqueId) {
-                    window.$('#stateText').text('Harap masukkan @username TikTok Anda.');
-                    return;
-                }
-                
-                if (!backendUrl) {
-                    window.$('#stateText').text('Kesalahan: backendUrl belum diatur di dalam kode script!');
-                    console.error('backendUrl is not set. Please edit the script tag in wordle-frontend-adjusted.html and set the backendUrl variable.');
-                    showModal("Kesalahan Konfigurasi", "<p><b>backendUrl</b> belum diatur di dalam file HTML.</p><p>Harap edit file HTML, cari variabel <b>backendUrl</b>, dan isi dengan URL aplikasi Railway Anda.</p>");
-                    return;
-                }
+            // [DIHAPUS] Logika memuat session ID dari localStorage
 
-                window.$('#stateText').text(`Menghubungkan ke ${backendUrl}...`).removeClass('connected');
-                
-                connection.io.uri = backendUrl;
-                connection.connect();
-                
-                connection.off('connect').on('connect', () => {
-                     window.$('#stateText').text('Terhubung ke server game! Mengautentikasi dengan TikTok...');
-                     // [TIDAK DIUBAH] Mengirim 'setUniqueId' ke server
-                     connection.emit('setUniqueId', uniqueId);
+            // [BARU] Flag untuk mode simulasi
+            let isSimulationMode = false; 
+
+            // [BARU] Handler untuk tombol toggle simulasi
+            $('#simToggleButton').click(function() {
+                isSimulationMode = !isSimulationMode;
+                if (isSimulationMode) {
+                    $('#simPanel').removeClass('hidden');
+                    $(this).text('Nonaktifkan Mode Simulasi').removeClass('from-yellow-500 to-orange-600').addClass('from-red-500 to-pink-600');
+                    $('#connectButton').text('Mulai Simulasi (Offline)');
+                    // Jika sedang terhubung, putuskan
+                    if (connection.connected) {
+                        connection.disconnect();
+                        $('#stateText').text('Mode simulasi aktif. Koneksi server diputus.').removeClass('connected');
+                    }
+                } else {
+                    $('#simPanel').addClass('hidden');
+                    $(this).text('Aktifkan Mode Simulasi').addClass('from-yellow-500 to-orange-600').removeClass('from-red-500 to-pink-600');
+                    $('#connectButton').text('Hubungkan ke Server Game');
+                    if ($('#stateText').text().includes('SIMULASI')) {
+                        $('#stateText').text('Mode simulasi nonaktif.').removeClass('connected');
+                    }
+                }
+            });
+
+            // [DIUBAH] Ganti fungsi tombol connect untuk server baru DAN simulasi
+            // [DIUBAH] Jadikan async untuk menunggu Firestore
+            $('#connectButton').click(async function() {
+                if (isSimulationMode) {
+                    // [BARU] Logika untuk mode simulasi
+                    $('#stateText').text('Terhubung (MODE SIMULASI)').addClass('connected');
+                    // Langsung mulai game tanpa koneksi socket
+                    startNewGame(); 
+                } else {
+                    // [PERUBAHAN] Logika untuk koneksi dinamis
+                    $('#stateText').text('Mengambil URL koneksi...').removeClass('connected');
+                    try {
+                        const configDocRef = doc(db, 'settings', 'mainConfig');
+                        const configDoc = await getDoc(configDocRef);
+                        
+                        if (!configDoc.exists() || !configDoc.data().websocketUrl) {
+                            $('#stateText').text('Error: URL Backend tidak diatur di admin panel!').removeClass('connected');
+                            return; // Hentikan jika URL tidak ada
+                        }
+                        
+                        const backendNgrokUrl = configDoc.data().websocketUrl;
+                        
+                        // [PENTING] Set URI (URL) socket.io SEBELUM menghubungkan
+                        connection.io.uri = backendNgrokUrl;
+                        
+                        $('#stateText').text(`Menghubungkan ke server...`).removeClass('connected');
+                        connection.connect(); // Sekarang panggil connect()
+
+                    } catch (err) {
+                        $('#stateText').text(`Gagal mengambil URL: ${err.message}`).removeClass('connected');
+                    }
+                }
+            });
+
+            // [BARU] Handler untuk tombol simulasi
+            $('#simGuessButton').click(function() {
+                if (!isSimulationMode) {
+                    showValidationToast('Mode simulasi harus aktif.');
+                    return;
+                }
+                if (isGamePaused || isGameOver) {
+                    showValidationToast('Game dijeda atau sudah berakhir.');
+                    return;
+                }
+                const guess = $('#simGuess').val().toUpperCase();
+                if (guess.length !== 5) {
+                    showValidationToast('Tebakan simulasi harus 5 huruf.');
+                    return;
+                }
+                const nick = $('#simName').val() || 'Simulator';
+                const mockUser = {
+                    userId: 'sim_' + nick.replace(/\s/g, '') + '_' + Date.now(), // ID unik berdasarkan nama
+                    nickname: nick,
+                    profilePictureUrl: 'https://placehold.co/100x100/f59e0b/ffffff?text=SIM'
+                };
+
+                // Meniru event handler 'tiktokBatch' untuk tebakan
+                guessQueue.push({ 
+                    guess: guess, 
+                    user: mockUser, 
+                    isManual: false 
                 });
+                processGuessQueue();
+                $('#simGuess').val(''); // Kosongkan input
+            });
+
+            // [BARU] Handler untuk tombol simulasi !win
+            $('#simWinButton').click(function() {
+                if (!isSimulationMode) {
+                    showValidationToast('Mode simulasi harus aktif.');
+                    return;
+                }
+                const nick = $('#simName').val() || 'Simulator';
+                const mockUser = {
+                    // Gunakan ID yang konsisten untuk user yang sama agar peringkatnya benar
+                    userId: 'sim_' + nick.replace(/\s/g, ''), 
+                    nickname: nick,
+                    profilePictureUrl: 'https://placehold.co/100x100/f59e0b/ffffff?text=SIM'
+                };
+                
+                // Meniru event handler 'tiktokBatch' untuk !win
+                showUserWinStatus(mockUser.userId, mockUser.nickname, mockUser.profilePictureUrl);
             });
             
-            // [TIDAK DIUBAH] Inisialisasi UI
+            // [BARU] Handler untuk tombol simulasi gift
+            $('#simGiftButton').click(function() {
+                if (!isSimulationMode) {
+                    showValidationToast('Mode simulasi harus aktif.');
+                    return;
+                }
+                
+                const diamonds = parseInt($('#simDiamonds').val()) || 0;
+                if (diamonds <= 0) {
+                    showValidationToast('Jumlah koin simulasi harus lebih dari 0.');
+                    return;
+                }
+                
+                const nick = $('#simName').val() || 'Simulator';
+                const giftName = $('#simGiftName').val() || 'Hadiah Simulasi';
+                
+                // Gunakan ID yang konsisten
+                const mockUser = {
+                    userId: 'sim_' + nick.replace(/\s/g, ''), 
+                    nickname: nick,
+                    profilePictureUrl: 'https://placehold.co/100x100/f59e0b/ffffff?text=SIM'
+                };
+
+                // Replikasi logika 'gift' event
+                const userId = mockUser.userId;
+                const currentDiamonds = topGifters[userId]?.diamonds || 0;
+                topGifters[userId] = {
+                    nickname: mockUser.nickname,
+                    pfp: mockUser.profilePictureUrl,
+                    diamonds: currentDiamonds + diamonds
+                };
+
+                // Update UI Marquee
+                updateTopGifterMarquee();
+
+                // Tambahkan ke chat
+                addChatItem('#facc15', mockUser, `mengirim ${giftName} senilai ${diamonds.toLocaleString()} koin!`);
+
+                // Reset input
+                $('#simGiftName').val('Mawar');
+                $('#simDiamonds').val('1');
+            });
+
+            // [DIHAPUS] Event listener untuk 'uniqueIdInput'
+
             initializeWordle();
-            window.$('#closeModalButton').on('click', () => window.$('#infoModal').addClass('hidden'));
+            $('#closeModalButton').on('click', () => $('#infoModal').addClass('hidden'));
             
-            // [DIUBAH] Logika tutup overlay !win
-            window.$('#userWinStatusOverlay').on('click', () => window.$('#userWinStatusOverlay').removeClass('visible'));
+            $('#userWinStatusOverlay').on('click', () => $('#userWinStatusOverlay').addClass('hidden'));
+            $('#rankUpdateOverlay').on('click', () => $('#rankUpdateOverlay').addClass('hidden'));
             
-            window.$('#rankUpdateOverlay').on('click', () => window.$('#rankUpdateOverlay').addClass('hidden'));
-            
-            // [TIDAK DIUBAH] Logika Tab
-            window.$('.tab-button').on('click', function() {
-                const targetPanel = window.$(this).data('tab'); 
-                window.$('.tab-button').removeClass('active').addClass('inactive');
-                window.$('.tab-content').addClass('hidden');
-                window.$(this).removeClass('inactive').addClass('active');
-                window.$('#' + targetPanel + '-panel').removeClass('hidden');
+            // [BARU] Logika untuk Tab
+            $('.tab-button').on('click', function() {
+                const targetPanel = $(this).data('tab'); // 'game', 'chat', or 'leaderboard'
+
+                // 1. De-aktivasi semua tombol, sembunyikan semua panel
+                $('.tab-button').removeClass('active').addClass('inactive');
+                $('.tab-content').addClass('hidden');
+
+                // 2. Aktivasi tombol yang diklik, tampilkan panel target
+                $(this).removeClass('inactive').addClass('active');
+                $('#' + targetPanel + '-panel').removeClass('hidden');
+
+                // [FIX] Auto-scroll ke atas jika pindah ke tab chat/leaderboard
                 if(targetPanel === 'chat') {
-                    window.$('.chatcontainer').stop().animate({ scrollTop: window.$('.chatcontainer')[0].scrollHeight }, 0);
+                    $('.chatcontainer').stop().animate({ scrollTop: $('.chatcontainer')[0].scrollHeight }, 0);
                 }
                 if(targetPanel === 'leaderboard') {
-                    window.$('#leaderboard-container').stop().animate({ scrollTop: 0 }, 0);
+                    $('#leaderboard-container').stop().animate({ scrollTop: 0 }, 0);
                 }
             });
             
-            // [TIDAK DIUBAH] Listener Game Control
             listenToGameControl();
             displayLeaderboard(); 
         });
 
-        // [TIDAK DIUBAH] Listener koneksi dari server.js
-        connection.on('tiktokConnected', (state) => {
-            // [DIUBAH] Sesuaikan 'uniqueId' dari 'state' jika ada, jika tidak, ambil dari input
-            const connectedUser = state.uniqueId || window.$('#uniqueIdInput').val().trim().replace(/^@/, '');
-            window.$('#stateText').text(`Terhubung ke LIVE @${connectedUser}!`).addClass('connected');
+        // [BARU] Listener untuk koneksi ke server backend (Tikfinity)
+        connection.on('connect', () => {
+            $('#stateText').text('Terhubung ke Server Backend! Menunggu data LIVE...').addClass('connected');
+            // Anda bisa memulai game di sini jika mau, atau menunggu event dari server
             startNewGame(); 
         });
 
-        connection.on('tiktokDisconnected', (errorMessage) => {
-            window.$('#stateText').text(`Koneksi TikTok Gagal/Terputus: ${errorMessage}.`).removeClass('connected');
-        });
-
-        connection.on('streamEnd', () => {
-            window.$('#stateText').text('LIVE telah berakhir.').removeClass('connected');
-            isGameOver = true;
-            clearInterval(countdownTimer);
-        });
-
         connection.on('disconnect', () => {
-            window.$('#stateText').text('Koneksi ke Server Game terputus.').removeClass('connected');
+            // Hanya tampilkan pesan putus jika tidak dalam mode simulasi
+            if (!$('#stateText').text().includes('SIMULASI')) {
+                $('#stateText').text('Koneksi ke Server Backend terputus.').removeClass('connected');
+            }
         });
         
-        // [TIDAK DIUBAH] Fungsi helper UI
+        connection.on('connect_error', (err) => {
+            // [BARU] Menangani error koneksi (mis. server down, CORS, URL salah)
+            $('#stateText').text(`Gagal terhubung: ${err.message}. Pastikan URL di admin panel benar.`).removeClass('connected');
+        });
+
+        // [DIHAPUS] Fungsi connect() yang lama tidak diperlukan lagi
+        
+        // ... (sanitize, updateRoomStats, generateUsernameLink, isPendingStreak, addChatItem) ...
         function sanitize(text) { return text.replace(/</g, '&lt;') }
-        function updateRoomStats() { window.$('#roomStats').html(`Viewers: <b class="text-white">${viewerCount.toLocaleString()}</b> Likes: <b class="text-white">${likeCount.toLocaleString()}</b> Diamonds: <b class="text-white">${diamondsCount.toLocaleString()}</b>`) }
+        function updateRoomStats() { $('#roomStats').html(`Viewers: <b class="text-white">${viewerCount.toLocaleString()}</b> Likes: <b class="text-white">${likeCount.toLocaleString()}</b> Diamonds: <b class="text-white">${diamondsCount.toLocaleString()}</b>`) }
         function generateUsernameLink(data) { return `<a class="usernamelink" href="https://www.tiktok.com/@${data.uniqueId}" target="_blank">${data.nickname}</a>`; }
         function isPendingStreak(data) { return data.giftType === 1 && !data.repeatEnd; }
         
         function addChatItem(color, data, text, summarize) {
-            let container = window.$('.chatcontainer');
+            let container = $('.chatcontainer');
             if (container.find('div').length > 500) { container.find('div').slice(0, 200).remove(); }
             container.find('.temporary').remove();;
-            container.find('.new-chat').removeClass('new-chat');
+
+            container.find('.new-chat').removeClass('new-chat'); // Hapus kelas dari yang lama
             
-            const newChatItem = window.$(
+            const newChatItem = $(
                 `<div class="${summarize ? 'temporary' : 'static'} new-chat">
                     <img class="miniprofilepicture" src="${data.profilePictureUrl}">
                     <span>
@@ -770,92 +987,125 @@
             container.stop().animate({ scrollTop: container[0].scrollHeight }, 400);
         }
         
-        // =================================================================
-        // [PERUBAHAN UTAMA] MENGGANTI 'tiktokBatch' DENGAN LISTENER INDIVIDUAL
-        // =================================================================
+        // ... (Event listener koneksi TikTok: roomUser, like, member, chat, social, streamEnd) ...
         
-        // [DIHAPUS] Listener tiktokBatch
-        // connection.on('tiktokBatch', (batch) => { ... });
+        // [DIUBAH] Listener lama dihapus dan diganti dengan listener untuk 'tiktokBatch'
+        
+        // Listener untuk event "tiktokBatch" dari server.js Anda
+        connection.on('tiktokBatch', (batch) => {
+            if (!Array.isArray(batch)) return; // Pastikan data adalah array
 
-        // [BARU] Menangani update viewer dari server.js
-        connection.on('roomUser', (msg) => {
-            if (typeof msg.viewerCount === 'number') {
-                viewerCount = msg.viewerCount;
-                updateRoomStats();
-            }
-        });
+            batch.forEach(event => {
+                
+                // Siapkan data pengguna universal
+                const userData = {
+                    userId: event.user || event.userId || event.uniqueId,
+                    nickname: event.nickname,
+                    profilePictureUrl: event.pfp || event.profilePictureUrl
+                };
 
-        // [BARU] Menangani member (join) dari server.js
-        connection.on('member', (msg) => {
-            const userData = { userId: msg.uniqueId, nickname: msg.nickname, profilePictureUrl: msg.profilePictureUrl };
-            addChatItem('#2dd4bf', userData, 'bergabung', true);
-        });
+                // Server Anda mengirim { type: "guess", ... }
+                if (event.type === 'guess') {
+                    const guessData = event.guess; // "WORDL"
 
-        // [BARU] Menangani like dari server.js
-        connection.on('like', (msg) => {
-            if (typeof msg.totalLikeCount === 'number') {
-                likeCount = msg.totalLikeCount;
-                updateRoomStats();
-            }
-            if (msg.likeCount > 0) {
-                const userData = { userId: msg.uniqueId, nickname: msg.nickname, profilePictureUrl: msg.profilePictureUrl };
-                addChatItem('#ec4899', userData, `${msg.likeCount} suka`);
-            }
-        });
+                    // Server Anda sudah memfilter 5 huruf, jadi kita bisa langsung menambahkannya
+                    guessQueue.push({ 
+                        guess: guessData, 
+                        user: userData, 
+                        isManual: false 
+                    });
+                    processGuessQueue(); 
+                
+                } else if (event.type === 'chat') {
+                    // [BARU] Menangani obrolan biasa
+                    addChatItem('', userData, event.text);
 
-        // [BARU] Menangani social (follow/share) dari server.js
-        connection.on('social', (msg) => {
-            if (msg.label) {
-                const userData = { userId: msg.uniqueId, nickname: msg.nickname, profilePictureUrl: msg.profilePictureUrl };
-                let color = msg.displayType.includes('follow') ? '#f43f5e' : '#2fb816';
-                addChatItem(color, userData, msg.label.replace('{0:user}', ''));
-            }
-        });
+                } else if (event.type === 'winCheck') {
+                    // [BARU] Menangani perintah !win
+                    showUserWinStatus(userData.userId, userData.nickname, userData.profilePictureUrl);
 
-        // [BARU] Menangani Chat (Tebakan, !win, obrolan biasa) dari server.js
-        connection.on('chat', (msg) => {
-            const text = (msg.comment || "").trim();
-            const textUpper = text.toUpperCase();
-            // Data pengguna dari event 'chat'
-            const userData = { 
-                userId: msg.uniqueId, 
-                nickname: msg.nickname, 
-                profilePictureUrl: msg.profilePictureUrl 
-            };
+                } else if (event.type === 'like') {
+                    // [BARU] Menangani like
+                    if (typeof event.totalLikeCount === 'number') {
+                        likeCount = event.totalLikeCount;
+                        updateRoomStats();
+                    }
+                    if (event.likeCount > 0) {
+                        addChatItem('#ec4899', event, `${event.likeCount} suka`);
+                    }
 
-            if (/^!WIN$/i.test(text)) {
-                // Menangani !win
-                showUserWinStatus(userData.userId, userData.nickname, userData.profilePictureUrl);
-            
-            } else if (/^[A-Z]{5}$/.test(textUpper)) {
-                // Menangani tebakan 5 huruf
-                guessQueue.push({ 
-                    guess: textUpper, 
-                    user: userData, 
-                    isManual: false 
-                });
-                processGuessQueue(); 
+                } else if (event.type === 'member') {
+                    // [BARU] Menangani member baru
+                    addChatItem('#2dd4bf', event, 'bergabung', true);
 
-            } else {
-                // Menangani obrolan biasa
-                addChatItem('', userData, text);
-            }
+                } else if (event.type === 'roomUser') {
+                    // [BARU] Menangani update viewer
+                    if (typeof event.viewerCount === 'number') {
+                        viewerCount = event.viewerCount;
+                        updateRoomStats();
+                    }
+                
+                } else if (event.type === 'social') {
+                    // [BARU] Menangani follow/share
+                    if (event.label) {
+                        let color = event.displayType.includes('follow') ? '#f43f5e' : '#2fb816';
+                        addChatItem(color, event, event.label.replace('{0:user}', ''));
+                    }
+                
+                // [BARU] Menangani event gift
+                } else if (event.type === 'gift') {
+                    // Asumsi event.diamonds ada dan event.giftName
+                    if (event.diamonds && event.diamonds > 0) {
+                        const userId = userData.userId;
+                        const currentDiamonds = topGifters[userId]?.diamonds || 0;
+                        topGifters[userId] = {
+                            nickname: userData.nickname,
+                            pfp: userData.profilePictureUrl,
+                            diamonds: currentDiamonds + event.diamonds
+                        };
+                        
+                        // Throttle DOM update
+                        const now = Date.now();
+                        if (now - lastGifterTime > 3000) { // Update max every 3 detik
+                            lastGifterTime = now;
+                            updateTopGifterMarquee();
+                        }
+                        
+                        // Juga tambahkan ke chat
+                        addChatItem('#facc15', userData, `mengirim ${event.giftName || 'hadiah'} senilai ${event.diamonds} koin!`);
+                    }
+                }
+                
+                // [DIHAPUS] Menangani perintah !next
+                /*
+                else if (event.type === 'nextGame') {
+                    if (isWaitingForNextGame) {
+                        console.log("!next command received during definition. Proceeding.");
+                        // Optional: Tampilkan di chat siapa yang memulai
+                        // addChatItem('#f59e0b', userData, 'memulai ronde berikutnya...');
+                        proceedToNextGame();
+                    }
+                }
+                */
+                
+                // CATATAN: Event lain seperti 'chat' biasa, 'like', 'follow',
+                // dan 'roomUser' tidak ditangani di sini karena server.js Anda
+                // tidak mengirimkannya.
+            });
         });
         
-        // [BARU] Listener statistik (opsional, tapi ada di server.js)
-        connection.on('statistic', (data) => {
-            // console.log("Statistik global:", data.globalConnectionCount);
-            // Tidak ada UI untuk ini, jadi biarkan saja
-        });
-        
-        // [DIHAPUS] Semua listener lama (roomUser, like, member, chat, social)
-        // karena sekarang ditangani oleh 'tiktokBatch'
+        // [DIHAPUS] Semua listener lama (roomUser, like, member, chat, social, streamEnd)
+        // connection.on('roomUser', (msg) => { ... })
+        // connection.on('like', (msg) => { ... })
+        // connection.on('member', (msg) => { ... })
+        // connection.on('chat', (msg) => { ... })
+        // connection.on('social', (data) => { ... })
+        // connection.on('streamEnd', () => { ... })
 
 
         /**
          * ===============================================
          * BAGIAN 3: WORDLE (KATLA) GAME LOGIC
-         * [TIDAK ADA PERUBAHAN DI BAWAH INI]
          * ===============================================
          */
         
@@ -879,6 +1129,9 @@
         let userGuessCount = {}; // { userId: count }
         
         let winnerListThisRound = []; 
+        let globalRankCache = {}; // [BARU] Cache untuk menyimpan peringkat user
+        let topGifters = {}; // [BARU] Cache untuk gifter ronde ini
+        let lastGifterTime = 0; // [BARU] Throttle untuk update marquee
         let isWaitingForNextGame = false; // [BARU] Status untuk jeda definisi
 
         const controlRef = doc(db, "gameControl", "liveState");
@@ -887,68 +1140,71 @@
         let lastManualGuessTime = 0;
         let forcedNextWordData = null;
 
-        // [BARU] Fungsi helper untuk mendapatkan inisial
-        function getInitials(name) {
-            if (!name) return '?';
-            const parts = name.trim().split(' ');
-            if (parts.length === 1) return name.substring(0, 2).toUpperCase();
-            // Ambil huruf pertama dari kata pertama dan kata terakhir
-            return (parts[0][0] + (parts[parts.length - 1][0] || '')).toUpperCase();
-        }
-
         function listenToGameControl() {
-            onSnapshot(controlRef, (docSnap) => {
-                if (!docSnap.exists()) return; 
-                const data = docSnap.data();
-                const wasPaused = isGamePaused;
-                isGamePaused = data.isPaused;
-                
-                if (isGamePaused && !wasPaused) {
-                    clearInterval(countdownTimer);
-                    window.$('#wordle-message').html('<span class="text-red-500 font-bold">PERMAINAN DIJEDA OLEH ADMIN</span>');
-                } else if (!isGamePaused && wasPaused) {
-                    if (!isGameOver) {
-                        countdownTimer = setInterval(updateTimer, 1000);
+            try {
+                onSnapshot(controlRef, (docSnap) => {
+                    if (!docSnap.exists()) {
+                        console.warn("Dokumen gameControl/liveState tidak ditemukan.");
+                        return; 
                     }
-                    if (window.$('#wordle-message').text().includes("DIJEDA")) {
-                        window.$('#wordle-message').text('');
-                    }
-                    processGuessQueue(); 
-                }
-
-                if (data.forceSkip > lastSkipTime) {
-                    lastSkipTime = data.forceSkip;
+                    const data = docSnap.data();
+                    const wasPaused = isGamePaused;
+                    isGamePaused = data.isPaused;
                     
-                    if (isWaitingForNextGame) {
-                        console.log("Admin skip detected during definition. Proceeding to next game.");
-                        proceedToNextGame();
-                    } else if (!isProcessingGuess && !isGameOver) { 
-                        console.log("Admin skip detected during active game. Triggering end game sequence.");
-                        triggerEndGameSequence();
-                    }
-                }
-                
-                if (data.nextWord && !data.nextWordUsed) {
-                    forcedNextWordData = { word: data.nextWord, arti: data.nextWordArti };
-                } else {
-                    forcedNextWordData = null;
-                }
-                if (data.manualGuess && data.manualGuess.timestamp > lastManualGuessTime) {
-                    lastManualGuessTime = data.manualGuess.timestamp;
-                    const { word, user } = data.manualGuess;
-                    if (word && user) {
-                        const mockUserData = {
-                            userId: 'admin_manual', 
-                            nickname: user, 
-                            profilePictureUrl: 'https://placehold.co/100x100/374151/9ca3af?text=USER'
-                        };
-                        guessQueue.push({ guess: word, user: mockUserData, isManual: true });
+                    if (isGamePaused && !wasPaused) {
+                        clearInterval(countdownTimer);
+                        $('#wordle-message').html('<span class="text-red-500 font-bold">PERMAINAN DIJEDA OLEH ADMIN</span>');
+                    } else if (!isGamePaused && wasPaused) {
+                        if (!isGameOver) {
+                            countdownTimer = setInterval(updateTimer, 1000);
+                        }
+                        if ($('#wordle-message').text().includes("DIJEDA")) {
+                            $('#wordle-message').text('');
+                        }
                         processGuessQueue(); 
                     }
-                }
-            });
+
+                    if (data.forceSkip > lastSkipTime) {
+                        lastSkipTime = data.forceSkip;
+                        
+                        // [DIUBAH] forceSkip sekarang bisa 2 fungsi:
+                        // 1. Lewati game yang sedang berjalan
+                        // 2. Lanjutkan dari layar definisi
+                        if (isWaitingForNextGame) {
+                            console.log("Admin skip detected during definition. Proceeding to next game.");
+                            proceedToNextGame();
+                        } else if (!isProcessingGuess && !isGameOver) { 
+                            console.log("Admin skip detected during active game. Triggering end game sequence.");
+                            triggerEndGameSequence();
+                        }
+                    }
+                    
+                    if (data.nextWord && !data.nextWordUsed) {
+                        forcedNextWordData = { word: data.nextWord, arti: data.nextWordArti };
+                    } else {
+                        forcedNextWordData = null;
+                    }
+                    if (data.manualGuess && data.manualGuess.timestamp > lastManualGuessTime) {
+                        lastManualGuessTime = data.manualGuess.timestamp;
+                        const { word, user } = data.manualGuess;
+                        if (word && user) {
+                            const mockUserData = {
+                                userId: 'admin_manual', 
+                                nickname: user, 
+                                profilePictureUrl: 'https://placehold.co/100x100/374151/9ca3af?text=USER'
+                            };
+                            guessQueue.push({ guess: word, user: mockUserData, isManual: true });
+                            processGuessQueue(); 
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error("Gagal mendengarkan game control:", error);
+                showModal("Error Firestore", "Gagal terhubung ke kontrol game. Fitur admin mungkin tidak berfungsi.");
+            }
         }
         
+        // [BARU] FUNGSI DIKEMBALIKAN
         function updateTimer() {
             if (isGameOver) {
                 clearInterval(countdownTimer);
@@ -957,7 +1213,7 @@
             timeLeft--;
             const minutes = Math.floor(timeLeft / 60);
             const seconds = timeLeft % 60;
-            const timerDisplay = window.$('#timer-display');
+            const timerDisplay = $('#timer-display');
             timerDisplay.text(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
 
             if (timeLeft <= 30) {
@@ -969,8 +1225,9 @@
             }
         }
         
+        // [BARU] FUNGSI DIKEMBALIKAN
         function updateBestGuessUI(bestGuessData) {
-            const container = window.$('#best-guess-container');
+            const container = $('#best-guess-container');
             container.empty();
             let tilesHtml = '';
             for (let i = 0; i < WORD_LENGTH; i++) {
@@ -979,36 +1236,40 @@
             container.html(tilesHtml);
         }
 
+        // [BARU] FUNGSI DIKEMBALIKAN
         function initializeWordle() {
-            containerElement = window.$('#wordle-container');
-            window.$('#newGameButton').on('click', startNewGame);
-            window.$('#timer-display').text(`${Math.floor(GAME_DURATION / 60).toString().padStart(2, '0')}:${(GAME_DURATION % 60).toString().padStart(2, '0')}`);
-            window.$('#wordle-message').html('Hubungkan ke LIVE untuk memulai...');
+            containerElement = $('#wordle-container');
+            $('#newGameButton').on('click', startNewGame);
+            $('#timer-display').text(`${Math.floor(GAME_DURATION / 60).toString().padStart(2, '0')}:${(GAME_DURATION % 60).toString().padStart(2, '0')}`);
+            $('#wordle-message').html('Hubungkan ke LIVE atau aktifkan Mode Simulasi untuk memulai...');
         }
         
+        // [BARU] FUNGSI DIKEMBALIKAN
         function showModal(title, content, autoCloseDelay = null) {
-            window.$('#modalTitle').text(title);
-            window.$('#modalContent').html(content);
-            window.$('#infoModal').removeClass('hidden');
+            $('#modalTitle').text(title);
+            $('#modalContent').html(content);
+            $('#infoModal').removeClass('hidden');
 
             if (autoCloseDelay) {
                 setTimeout(() => {
-                    window.$('#infoModal').addClass('hidden');
+                    $('#infoModal').addClass('hidden');
                 }, autoCloseDelay);
             }
         }
 
+        // [BARU] FUNGSI DIKEMBALIKAN
         function showValidationToast(content) {
             clearTimeout(validationToastTimeout);
-            const toast = window.$('#validationToast');
-            window.$('#validationToastContent').html(content);
+            const toast = $('#validationToast');
+            $('#validationToastContent').html(content);
             toast.removeClass('opacity-0 translate-x-full');
             validationToastTimeout = setTimeout(() => {
                 toast.addClass('opacity-0 translate-x-full');
             }, 3000);
-            processGuessQueue(); 
+            // [DIHAPUS] processGuessQueue() dihapus dari sini agar tidak menyebabkan infinite loop jika validasi gagal
         }
         
+        // [BARU] FUNGSI DIKEMBALIKAN
         async function fetchRandomWordFromFirebase(length) {
             if (wordCache[length] && wordCache[length].length > 0) {
                 return wordCache[length][Math.floor(Math.random() * wordCache[length].length)];
@@ -1027,6 +1288,7 @@
             }
         }
         
+        // [BARU] FUNGSI DIKEMBALIKAN
         async function validateWordWithFirebase(word) {
             try {
                 const wordRef = doc(db, "words", word.toUpperCase());
@@ -1038,6 +1300,7 @@
             }
         }
 
+        // [BARU] FUNGSI DIKEMBALIKAN
         async function startNewGame() {
             if (isProcessingGuess) return;
             if (!db) {
@@ -1045,37 +1308,41 @@
                 return;
             }
             
-            window.$('#rankUpdateOverlay').addClass('hidden');
+            $('#rankUpdateOverlay').addClass('hidden');
             
             isProcessingGuess = true;
             isGameOver = true;
             
             clearInterval(countdownTimer);
             timeLeft = GAME_DURATION;
-            window.$('#timer-display').text(`${Math.floor(GAME_DURATION / 60).toString().padStart(2, '0')}:${(GAME_DURATION % 60).toString().padStart(2, '0')}`);
-            window.$('#timer-display').removeClass('timer-low'); // Hapus kelas animasi
+            $('#timer-display').text(`${Math.floor(GAME_DURATION / 60).toString().padStart(2, '0')}:${(GAME_DURATION % 60).toString().padStart(2, '0')}`);
+            $('#timer-display').removeClass('timer-low'); // Hapus kelas animasi
             
-            window.$('#wordle-message').html('<span class="loader"></span><span class="ml-2 text-cyan-300">Memuat kata baru...</span>');
+            $('#wordle-message').html('<span class="loader"></span><span class="ml-2 text-cyan-300">Memuat kata baru...</span>');
             
             containerElement.empty();
-            window.$('#best-guess-container').empty();
+            $('#best-guess-container').empty();
             
             bestGuess = { score: -1, word: "", classes: [] };
             guessCount = 0;
             userGuessCount = {}; 
             guessQueue = []; 
             winnerListThisRound = []; 
+            topGifters = {}; // [BARU] Reset top gifters
+            updateTopGifterMarquee(); // [BARU] Kosongkan marquee UI
 
             if (forcedNextWordData) {
                 targetWord = forcedNextWordData.word;
                 targetWordDefinition = forcedNextWordData.arti;
-                await updateDoc(controlRef, { nextWord: "", nextWordArti: "", nextWordUsed: true });
+                try {
+                    await updateDoc(controlRef, { nextWord: "", nextWordArti: "", nextWordUsed: true });
+                } catch(e) { console.error("Gagal update nextWordUsed (1):", e); }
                 forcedNextWordData = null;
             } else {
                 const wordData = await fetchRandomWordFromFirebase(WORD_LENGTH);
                 if (!wordData || wordData.word === "ERROR") {
                     isProcessingGuess = false;
-                    window.$('#wordle-message').text('Gagal memuat kata. Coba lagi.');
+                    $('#wordle-message').text('Gagal memuat kata. Coba lagi.');
                     return;
                 }
                 targetWord = wordData.word;
@@ -1086,6 +1353,13 @@
                 await updateDoc(controlRef, { activeWord: targetWord });
             } catch (error) {
                 console.error("Gagal update kata aktif:", error);
+                 // Coba buat dokumen jika tidak ada
+                try {
+                    await setDoc(controlRef, { activeWord: targetWord, isPaused: false, forceSkip: 0, manualGuess: {}, nextWord: "", nextWordArti: "", nextWordUsed: false }, { merge: true });
+                    console.log("Dokumen gameControl dibuat.");
+                } catch (e) {
+                    console.error("Gagal membuat dokumen gameControl:", e);
+                }
             }
             
             console.log(`New Game. Target: ${targetWord}`);
@@ -1093,12 +1367,13 @@
             isGameOver = false;
             isProcessingGuess = false;
             if (!isGamePaused) {
-                window.$('#wordle-message').text('');
+                $('#wordle-message').text('');
                 countdownTimer = setInterval(updateTimer, 1000);
             }
             processGuessQueue(); 
         }
 
+        // [BARU] FUNGSI DIKEMBALIKAN
         async function triggerEndGameSequence() {
             if (isGameOver) return; 
             
@@ -1106,9 +1381,12 @@
             clearInterval(countdownTimer);
             console.log("Triggering End Game Sequence...");
 
+            // [DIUBAH] Logika modal pemenang/kalah dihapus.
+            // Notifikasi pemenang pertama ditangani oleh showWinnerCelebration.
+            // Notifikasi Waktu Habis (jika tidak ada pemenang) ditambahkan.
             if (winnerListThisRound.length === 0) {
                  // Hanya tampilkan "WAKTU HABIS" jika tidak ada pemenang
-                let content = `<p class="text-lg">WAKTU HABIS! Tidak ada pemenang.</p>`;
+                let content = `<p class="text-lg">Tidak ada pemenang.</p>`;
                 content += `<p class="text-lg mt-2">Kata yang benar adalah: <b class="text-cyan-400 text-2xl font-bold">${targetWord}</b></p>`;
                 showModal("WAKTU HABIS!", content);
                 
@@ -1116,39 +1394,52 @@
                 await new Promise(resolve => setTimeout(resolve, 5000));
             }
             
-            window.$('#infoModal').addClass('hidden'); // Sembunyikan modal (baik Waktu Habis atau modal sebelumnya)
+            $('#infoModal').addClass('hidden'); // Sembunyikan modal (baik Waktu Habis atau modal sebelumnya)
 
             // 2. Tampilkan Modal Definisi
             const definitionTitle = `Definisi: ${targetWord}`;
+            // [DIUBAH] Hapus instruksi !next
             let definitionContent = `<div class="text-left"><p class="text-base text-gray-200">${targetWordDefinition || 'Definisi tidak tersedia.'}</p></div>`;
+            // [DIHAPUS] Instruksi !next
+            // definitionContent += `<p class="text-center text-cyan-300 font-medium mt-4 text-sm">Ketik <b class="text-white">!next</b> di chat atau tunggu Host<br>untuk memulai ronde berikutnya.</p>`;
             
             showModal(definitionTitle, definitionContent);
             
+            // [BARU] Set status jeda (untuk tombol admin)
             isWaitingForNextGame = true;
 
+            // [BARU] Jeda 10 detik lalu lanjut otomatis
             setTimeout(proceedToNextGame, 10000); 
         }
 
+        // [BARU] FUNGSI DIKEMBALIKAN
         async function proceedToNextGame() {
             if (!isWaitingForNextGame) return; // Hindari trigger ganda
             
             isWaitingForNextGame = false;
             
-            window.$('#infoModal').addClass('hidden');
+            $('#infoModal').addClass('hidden');
             
+            // 3. Tampilkan Overlay Peringkat
             showRankUpdateOverlay(); 
             
             await new Promise(resolve => setTimeout(resolve, 5000));
-            window.$('#rankUpdateOverlay').addClass('hidden'); 
+            $('#rankUpdateOverlay').addClass('hidden'); 
 
             isProcessingGuess = false;
 
-            window.$('#wordle-message').html(`<span class="text-gray-400">Memulai ronde berikutnya...</span>`);
+            // 4. Mulai Game Baru
+            $('#wordle-message').html(`<span class="text-gray-400">Memulai ronde berikutnya...</span>`);
             setTimeout(startNewGame, 1000);
         }
 
+        // [BARU] FUNGSI DIKEMBALIKAN
         async function updateGlobalScore(userId, nickname, pfp, pointsToAdd) {
-            if (!userId || userId === 'admin_manual') return; 
+            // [DIUBAH] Jangan update skor untuk user simulasi
+            if (!userId || userId === 'admin_manual' || userId.startsWith('sim_')) {
+                console.log(`Skor tidak disimpan untuk user simulasi/admin: ${nickname}`);
+                return;
+            }
             
             const userDocRef = doc(db, "leaderboard", userId);
             try {
@@ -1159,7 +1450,8 @@
                         globalScore: increment(pointsToAdd),
                         totalWins: increment(1),
                         nickname: nickname, 
-                        pfp: pfp
+                        pfp: pfp,
+                        lastActive: new Date().toISOString() // [BARU] Lacak kapan user aktif
                     });
                 } else {
                     await setDoc(userDocRef, {
@@ -1167,7 +1459,9 @@
                         nickname: nickname,
                         pfp: pfp, 
                         globalScore: pointsToAdd,
-                        totalWins: 1
+                        totalWins: 1,
+                        firstActive: new Date().toISOString(), // [BARU]
+                        lastActive: new Date().toISOString()
                     });
                 }
                 
@@ -1177,8 +1471,9 @@
             }
         }
         
+        // [BARU] FUNGSI DIKEMBALIKAN
         function displayLeaderboard() {
-            const leaderboardContainer = window.$('#leaderboard-container');
+            const leaderboardContainer = $('#leaderboard-container');
             const q = query(
                 collection(db, "leaderboard"), 
                 orderBy("globalScore", "desc"), 
@@ -1186,6 +1481,7 @@
             );
 
             onSnapshot(q, (snapshot) => {
+                globalRankCache = {}; // [BARU] Reset cache peringkat setiap ada update
                 leaderboardContainer.empty();
                 if (snapshot.empty) {
                     leaderboardContainer.html('<p class="text-gray-400 text-center">Belum ada di papan peringkat.</p>');
@@ -1195,13 +1491,17 @@
                 let rank = 1;
                 snapshot.forEach((doc) => {
                     const user = doc.data();
-                    const rankClass = rank === 1 ? "text-yellow-400" : (rank === 2 ? "text-gray-300" : (rank === 3 ? "text-yellow-700" : "text-gray-500"));
+                    globalRankCache[user.userId] = rank; // [BARU] Simpan peringkat ke cache
+                    
+                    // [DIUBAH] Terapkan kelas rank-1, rank-2, rank-3
+                    const rankClassNum = rank === 1 ? "rank-1" : (rank === 2 ? "rank-2" : (rank === 3 ? "rank-3" : ""));
+                    const rankClassText = rank === 1 ? "text-yellow-400" : (rank === 2 ? "text-gray-300" : (rank === 3 ? "text-yellow-700" : "text-gray-500"));
                     
                     const userHtml = `
                         <div>
                             <div class="leaderboard-user">
-                                <span class="leaderboard-rank ${rankClass}">${rank}</span>
-                                <img src="${user.pfp}" class="leaderboard-pfp" onerror="this.src='https://placehold.co/50x50/374151/9ca3af?text=?';">
+                                <span class="leaderboard-rank ${rankClassText}">${rank}</span>
+                                <img src="${user.pfp}" class="leaderboard-pfp ${rankClassNum}" onerror="this.src='https://placehold.co/50x50/374151/9ca3af?text=?';">
                                 <span class="leaderboard-name">${sanitize(user.nickname)}</span>
                             </div>
                             <span class="leaderboard-score">${user.globalScore} Poin</span>
@@ -1216,6 +1516,7 @@
             });
         }
 
+        // [BARU] FUNGSI DIKEMBALIKAN
         function processGuessQueue() {
             if (isGamePaused || isGameOver || isProcessingGuess || guessQueue.length === 0) {
                 return;
@@ -1224,50 +1525,80 @@
             isProcessingGuess = true; 
             const nextGuessData = guessQueue.shift();
             
-            handleGuess(nextGuessData.guess, nextGuessData.user, nextGuessData.isManual);
+            // Panggil handleGuess dan pastikan itu selesai (termasuk validasi)
+            // sebelum memanggil processGuessQueue() lagi di dalam 'finally'
+            handleGuess(nextGuessData.guess, nextGuessData.user, nextGuessData.isManual)
+                .catch((error) => {
+                    console.error("Error handling guess:", error);
+                })
+                .finally(() => {
+                    // [DIUBAH] isProcessingGuess dipindahkan ke dalam 'finally'
+                    // Hapus baris 'isProcessingGuess = false' dari dalam handleGuess
+                    isProcessingGuess = false;
+                    // Panggil antrian berikutnya
+                    processGuessQueue();
+                });
         }
 
-        function showWinnerCelebration(user, rankText) {
+        // [BARU] Fungsi untuk menampilkan overlay perayaan
+        function showWinnerCelebration(user, rankText, winnerRank = 0) { // [DIUBAH] Tambahkan winnerRank
             // Mengembalikan Promise agar kita bisa menunggu animasinya selesai
             return new Promise(resolve => {
-                const overlay = window.$('#winnerCelebrationOverlay');
-                const card = window.$('#winnerCelebrationCard');
+                const overlay = $('#winnerCelebrationOverlay');
+                const card = $('#winnerCelebrationCard');
+                const pfp = overlay.find('#celebration-pfp'); // [BARU]
 
+                // 1. Reset
                 overlay.removeClass('visible');
+                pfp.removeClass('rank-1-pfp rank-2-pfp rank-3-pfp border-cyan-400'); // [BARU] Reset kelas rank
                 
-                overlay.find('#celebration-pfp')
-                       .attr('src', user.profilePictureUrl || 'https://placehold.co/128x128/374151/9ca3af?text=?')
-                       .on('error', function() { this.src='https://placehold.co/128x128/374151/9ca3af?text=?'; });
+                // 2. Isi konten
+                pfp.attr('src', user.profilePictureUrl || 'https://placehold.co/128x128/374151/9ca3af?text=?')
+                   .on('error', function() { this.src='https://placehold.co/128x128/374151/9ca3af?text=?'; });
                 overlay.find('#celebration-name').text(user.nickname);
                 overlay.find('#celebration-rank').text(rankText);
+
+                // [BARU] Tambahkan kelas rank yang sesuai
+                if (winnerRank === 1) {
+                    pfp.addClass('rank-1-pfp');
+                } else if (winnerRank === 2) {
+                    pfp.addClass('rank-2-pfp');
+                } else if (winnerRank === 3) {
+                    pfp.addClass('rank-3-pfp');
+                } else {
+                    pfp.addClass('border-cyan-400'); // Fallback border
+                }
                 
+                // 3. Tampilkan overlay dan picu animasi
                 overlay.addClass('visible');
 
+                // 4. Sembunyikan setelah 4 detik
                 setTimeout(() => {
                     overlay.removeClass('visible');
-                    setTimeout(resolve, 300); 
-                }, 4000); 
+                    // Selesaikan promise SETELAH animasi fade-out selesai
+                    setTimeout(resolve, 300); // 300ms = durasi 'celebrationFadeIn'
+                }, 4000); // Tampilkan selama 4 detik
             });
         }
 
+        // [DIUBAH] Ubah menjadi fungsi async untuk menangani validasi
         async function handleGuess(guess, userData, isManualGuess = false) {
             
             const userId = userData.userId;
 
+            // [DIUBAH] Hapus 'isProcessingGuess = false' dan 'processGuessQueue()'
+            // Ini sekarang ditangani oleh 'finally' di processGuessQueue()
+            
             if (userId !== 'admin_manual' && !isManualGuess && winnerListThisRound.find(w => w.userId === userId)) {
                 showValidationToast(`<b>${sanitize(userData.nickname)}</b>, Anda sudah menang ronde ini!`);
-                isProcessingGuess = false;
-                processGuessQueue();
-                return;
+                return; // Keluar, 'finally' akan berjalan
             }
 
             if (userId !== 'admin_manual' && !isManualGuess) {
                 const currentGuesses = userGuessCount[userId] || 0;
                 if (currentGuesses >= 5) {
-                    showValidationToast(`<b>${sanitize(userData.nickname)}</b>, Anda sudah 5x menebak!`);
-                    isProcessingGuess = false; 
-                    processGuessQueue(); 
-                    return; 
+                    showValidationToast(`<b>${sanitize(userData.nickname)}</b>, Kamu sudah 5x menebak!`);
+                    return; // Keluar, 'finally' akan berjalan
                 }
                 userGuessCount[userId] = currentGuesses + 1; 
             }
@@ -1276,12 +1607,23 @@
             if (!validation.isValid) {
                 const toastContent = `Kata <b>${guess}</b> tidak valid! <span class="text-xs opacity-75 block">Dari: ${sanitize(userData.nickname)}</span>`;
                 showValidationToast(toastContent);
-                isProcessingGuess = false;
-                processGuessQueue(); 
-                return;
+                
+                // [FIX] Jika kata tidak valid, kurangi kembali jumlah tebakan
+                if (userId !== 'admin_manual' && !isManualGuess) {
+                    userGuessCount[userId] = (userGuessCount[userId] || 1) - 1;
+                }
+                
+                return; // Keluar, 'finally' akan berjalan
             }
             
-            const pfpHtml = `<img src="${userData.profilePictureUrl}" class="guesser-pfp ${isManualGuess ? 'manual' : ''}" onerror="this.src='https://placehold.co/52x52/374151/9ca3af?text=?';">`;
+            // [BARU] Tambahkan kelas peringkat PFP
+            const userRank = globalRankCache[userId] || 0;
+            let rankPfpClass = '';
+            if (userRank === 1) rankPfpClass = 'rank-1-pfp';
+            else if (userRank === 2) rankPfpClass = 'rank-2-pfp';
+            else if (userRank === 3) rankPfpClass = 'rank-3-pfp';
+
+            const pfpHtml = `<img src="${userData.profilePictureUrl}" class="guesser-pfp ${isManualGuess ? 'manual' : ''} ${rankPfpClass}" onerror="this.src='https://placehold.co/52x52/374151/9ca3af?text=?';">`;
             
             let chancesText = '';
             if (userId !== 'admin_manual' && !isManualGuess) {
@@ -1290,14 +1632,9 @@
                  chancesText = `<span class="guesser-chances">(Sisa: ${chancesLeft})</span>`;
             }
 
-            // [DIUBAH] Tambahkan span .full-name dan .initials
-            const initials = getInitials(userData.nickname);
             const nameHtml = `
                 <div class="${isManualGuess ? 'manual' : ''}">
-                    <span class="guesser-name">
-                        <span class="full-name">${sanitize(userData.nickname)}</span>
-                        <span class="initials">${sanitize(initials)}</span>
-                    </span>
+                    <span class="guesser-name">${sanitize(userData.nickname)}</span>
                     ${chancesText}
                 </div>
             `;
@@ -1310,18 +1647,42 @@
             
             const currentTiles = containerElement.find('.wordle-row-container').first().find('.tile'); 
 
-            let checkWin = true;
-            const letterClasses = guess.split('').map((letter, i) => {
-                if (letter === targetWord[i]) {
-                    return 'correct';
-                } else if (targetWord.includes(letter)) {
-                    checkWin = false;
-                    return 'present';
-                } else {
-                    checkWin = false;
-                    return 'absent';
+            // [DIUBAH] Logika Wordle yang Benar (Dua Pass)
+            const targetLetters = targetWord.split('');
+            const guessLetters = guess.split('');
+            const letterClasses = new Array(WORD_LENGTH).fill(null);
+            let checkWin = true; // Asumsikan menang, batalkan jika ada yang salah
+
+            // Pass 1: Cari yang 'correct' (hijau)
+            for (let i = 0; i < WORD_LENGTH; i++) {
+                if (guessLetters[i] === targetLetters[i]) {
+                    letterClasses[i] = 'correct';
+                    targetLetters[i] = null; // Tandai sebagai sudah terpakai
                 }
-            });
+            }
+
+            // Pass 2: Cari yang 'present' (kuning) dan 'absent' (abu-abu)
+            for (let i = 0; i < WORD_LENGTH; i++) {
+                // Lewati jika sudah 'correct'
+                if (letterClasses[i] === 'correct') {
+                    continue;
+                }
+
+                const guessedLetter = guessLetters[i];
+                const presentIndex = targetLetters.indexOf(guessedLetter);
+
+                if (presentIndex !== -1) {
+                    // Ada, tapi di posisi salah
+                    letterClasses[i] = 'present';
+                    targetLetters[presentIndex] = null; // Tandai sebagai sudah terpakai
+                    checkWin = false; // Pasti tidak menang jika ada 'present'
+                } else {
+                    // Tidak ada sama sekali
+                    letterClasses[i] = 'absent';
+                    checkWin = false; // Pasti tidak menang jika ada 'absent'
+                }
+            }
+            // [AKHIR DARI BLOK YANG DIUBAH]
 
             let currentScore = 0;
             letterClasses.forEach(cls => {
@@ -1335,8 +1696,8 @@
             }
 
             for (let i = 0; i < WORD_LENGTH; i++) {
-                await new Promise(resolve => setTimeout(resolve, 100)); 
-                const tile = window.$(currentTiles[i]);
+                await new Promise(resolve => setTimeout(resolve, 100)); /* [DIUBAH] 250 -> 100 */
+                const tile = $(currentTiles[i]);
                 tile.addClass('flip').find('.back').parent().addClass(letterClasses[i]);
             }
             
@@ -1350,24 +1711,25 @@
                     const winnerRank = winnerListThisRound.length + 1;
                     let pointsToAdd = 0;
                     let rankText = "";
-                    let celebrationText = ""; 
+                    let celebrationText = ""; // [BARU] Teks untuk overlay
 
+                    // [DIUBAH] Hanya pemenang 1 yang dapat poin
                     if (winnerRank === 1) {
                         pointsToAdd = 3;
                         rankText = "Pemenang ke-1 (+3 Poin)";
-                        celebrationText = "TEBAKAN TEPAT!"; 
+                        celebrationText = "TEBAKAN KAMU TEPAT!"; // [DIUBAH] Teks perayaan lebih simpel
                     } else if (winnerRank === 2) {
-                        pointsToAdd = 0; 
-                        rankText = "Pemenang ke-2 (0 Poin)"; 
-                        celebrationText = "Tebakan Tepat!"; 
+                        pointsToAdd = 0; // [DIUBAH]
+                        rankText = "Pemenang ke-2 (0 Poin)"; // [DIUBAH]
+                        celebrationText = "TEBAKAN KAMU TEPAT!"; // [BARU]
                     } else if (winnerRank === 3) {
-                        pointsToAdd = 0; 
-                        rankText = "Pemenang ke-3 (0 Poin)"; 
-                        celebrationText = "Tebakan Tepat!"; 
+                        pointsToAdd = 0; // [DIUBAH]
+                        rankText = "Pemenang ke-3 (0 Poin)"; // [DIUBAH]
+                        celebrationText = "TEBAKAN KAMU TEPAT!"; // [BARU]
                     } else {
                         pointsToAdd = 0;
                         rankText = `Pemenang ke-${winnerRank} (0 Poin)`;
-                        celebrationText = "Tebakan Tepat!"; 
+                        celebrationText = "TEBAKAN KAMU TEPAT!"; // [BARU]
                     }
 
                     winnerListThisRound.push({
@@ -1381,21 +1743,24 @@
                         updateGlobalScore(userId, userData.nickname, userData.profilePictureUrl, pointsToAdd);
                     }
                     
-                    isProcessingGuess = true; 
-                    await showWinnerCelebration(userData, celebrationText); 
+                    // [DIUBAH] Tampilkan perayaan, BUKAN toast
+                    // showValidationToast(`<b>${sanitize(userData.nickname)}</b> adalah <b>${rankText}</b>!`);
+                    
+                    // Jeda antrian selagi perayaan
+                    // Kita tidak set 'isProcessingGuess' karena 'finally' akan menanganinya
+                    await showWinnerCelebration(userData, celebrationText, winnerRank); // [DIUBAH] Menggunakan celebrationText dan winnerRank
 
+                    // [PERUBAHAN] Jika ini pemenang PERTAMA, hentikan permainan
                     if (winnerRank === 1) {
                         console.log("First winner found. Triggering end game sequence.");
                         triggerEndGameSequence();
+                        // Jangan panggil processGuessQueue() lagi
                         return; 
                     }
                     
-                    isProcessingGuess = false; 
-                    processGuessQueue(); 
-
                 } else if (isManualGuess) {
-                    isProcessingGuess = true; 
-                    await showWinnerCelebration(userData, "Tebakan Manual Berhasil!");
+                    // [DIUBAH] Tampilkan perayaan untuk tebakan manual
+                    await showWinnerCelebration(userData, "Tebakan Manual Berhasil!", 1); // [DIUBAH] Tambahkan rank 1
 
                     if (!winnerListThisRound.find(w => w.isManual && w.nickname === userData.nickname)) {
                         winnerListThisRound.push({
@@ -1414,13 +1779,53 @@
                 
             } else {
                 guessCount++;
-                isProcessingGuess = false; 
-                processGuessQueue(); 
             }
+            // 'finally' di processGuessQueue akan menangani pemanggilan berikutnya
+        }
+
+        // [BARU] Fungsi untuk update marquee top gifter
+        function updateTopGifterMarquee() {
+            const marqueeContainer = $('#gifter-marquee');
+            const content = $('#gifter-marquee-content');
+            
+            // Ubah objek topGifters menjadi array dan urutkan
+            const sortedGifters = Object.values(topGifters).sort((a, b) => b.diamonds - a.diamonds);
+            
+            if (sortedGifters.length === 0) {
+                marqueeContainer.addClass('hidden');
+                return;
+            }
+
+            marqueeContainer.removeClass('hidden');
+            content.empty(); // Kosongkan konten lama
+
+            // Buat elemen marquee
+            let itemsHtml = '';
+            sortedGifters.slice(0, 10).forEach(gifter => { // Ambil top 10
+                itemsHtml += `
+                    <div class="marquee-item">
+                        <img src="${gifter.pfp}" class="marquee-pfp" onerror="this.src='https://placehold.co/32x32/374151/9ca3af?text=?';">
+                        <span class="marquee-name">${sanitize(gifter.nickname)}</span>
+                        <span class="marquee-diamonds">(${gifter.diamonds.toLocaleString()})</span>
+                    </div>
+                `;
+            });
+
+            // Duplikasi item untuk loop yang mulus jika item sedikit
+            if (sortedGifters.length < 5) {
+                content.html(itemsHtml.repeat(3));
+            } else {
+                content.html(itemsHtml.repeat(2)); // Ulangi sekali untuk loop
+            }
+
+            // Atur durasi animasi berdasarkan jumlah item
+            const totalItems = sortedGifters.length < 5 ? sortedGifters.length * 3 : sortedGifters.length * 2;
+            const duration = totalItems * 8; // 8 detik per item (estimasi)
+            content.css('animation-duration', `${duration}s`);
         }
 
         async function showRankUpdateOverlay() {
-            const overlay = window.$('#rankUpdateOverlay');
+            const overlay = $('#rankUpdateOverlay');
             const list = overlay.find('#rankUpdateList');
             list.html('<span class="loader"></span>');
             overlay.removeClass('hidden');
@@ -1440,11 +1845,12 @@
                     let rank = 1;
                     snapshot.forEach((doc) => {
                         const user = doc.data();
+                        // [DIUBAH] Terapkan kelas rank-1, rank-2, rank-3
                         const rankClass = rank === 1 ? "rank-1" : (rank === 2 ? "rank-2" : (rank === 3 ? "rank-3" : ""));
                         list.append(`
                             <div class="rank-item ${rankClass}">
                                 <span class="rank-num">#${rank}</span>
-                                <img src="${user.pfp}" class="rank-pfp" onerror="this.src='https://placehold.co/32x32/374151/9ca3af?text=?';">
+                                <img src="${user.pfp}" class="rank-pfp ${rankClass}" onerror="this.src='https://placehold.co/32x32/374151/9ca3af?text=?';">
                                 <span class="rank-name">${sanitize(user.nickname)}</span>
                                 <span class="rank-score">${user.globalScore} Poin</span>
                             </div>
@@ -1460,50 +1866,58 @@
 
         async function showUserWinStatus(userId, nickname, pfp) {
             if (!userId) return;
-            const overlay = window.$('#userWinStatusOverlay');
+            const overlay = $('#userWinStatusOverlay');
             const content = overlay.find('#userWinStatusContent');
             content.html('<span class="loader"></span><p class="mt-2">Mencari data...</p>');
-            // [DIUBAH] Gunakan kelas .visible
-            overlay.addClass('visible');
+            overlay.removeClass('hidden');
 
             try {
-                const userDocRef = doc(db, "leaderboard", userId);
-                const userDocSnap = await getDoc(userDocRef);
+                // [DIUBAH] Tangani user simulasi secara berbeda
+                if (userId.startsWith('sim_')) {
+                    content.html(`
+                        <img src="${pfp}" class="win-status-pfp" style="font-size: 0.9rem;" onerror="this.src='https://placehold.co/80x80/374151/9ca3af?text=?';">
+                        <h4 class="win-status-name" style="font-size: 1.25rem;">${sanitize(nickname)}</h4>
+                        <p class="win-status-score" style="font-size: 0.9rem;">Total Poin: <b>0</b> (Simulasi)</p>
+                        <p class="win-status-score" style="font-size: 0.9rem;">Total Menang: <b>0</b> (Simulasi)</p>
+                        <p class="win-status-rank" style="font-size: 0.9rem;">Peringkat: <b>N/A</b> (Simulasi)</p>
+                    `);
+                } else {
+                    const userDocRef = doc(db, "leaderboard", userId);
+                    const userDocSnap = await getDoc(userDocRef);
 
-                let userScore = 0;
-                let userWins = 0; 
-                if (userDocSnap.exists()) {
-                    userScore = userDocSnap.data().globalScore || 0;
-                    userWins = userDocSnap.data().totalWins || 0; 
+                    let userScore = 0;
+                    let userWins = 0; 
+                    if (userDocSnap.exists()) {
+                        userScore = userDocSnap.data().globalScore || 0;
+                        userWins = userDocSnap.data().totalWins || 0; 
+                    }
+
+                    const q = query(
+                        collection(db, "leaderboard"), 
+                        where("globalScore", ">", userScore)
+                    );
+                    const snapshot = await getDocs(q);
+                    const rank = snapshot.size + 1;
+
+                    content.html(`
+                        <img src="${pfp}" class="win-status-pfp" style="font-size: 0.9rem;" onerror="this.src='https://placehold.co/80x80/374151/9ca3af?text=?';">
+                        <h4 class="win-status-name" style="font-size: 1.25rem;">${sanitize(nickname)}</h4>
+                        <p class="win-status-score" style="font-size: 0.9rem;">Total Poin: <b>${userScore}</b></p>
+                        <p class="win-status-score" style="font-size: 0.9rem;">Total Menang (1-3): <b>${userWins}</b></p>
+                        <p class="win-status-rank" style="font-size: 0.9rem;">Peringkat: <b>#${rank}</b></p>
+                    `);
                 }
-
-                const q = query(
-                    collection(db, "leaderboard"), 
-                    where("globalScore", ">", userScore)
-                );
-                const snapshot = await getDocs(q);
-                const rank = snapshot.size + 1;
-
-                // [DIUBAH] Hapus <img> dan style inline
-                content.html(`
-                    <h4 class="win-status-name">${sanitize(nickname)}</h4>
-                    <p class="win-status-score">Total Poin: <b>${userScore}</b></p>
-                    <p class="win-status-score">Total Menang (1-3): <b>${userWins}</b></p>
-                    <p class="win-status-rank">Peringkat: <b>#${rank}</b></p>
-                `);
 
             } catch (error) {
                 console.error("Error fetching user win status:", error);
                 content.html('<p class="text-red-400" style="font-size: 0.9rem;">Gagal mengambil data.</p>');
             }
 
-            // [DIUBAH] Gunakan kelas .visible
             setTimeout(() => {
-                overlay.removeClass('visible');
+                overlay.addClass('hidden');
             }, 8000); 
         }
 
     </script>
 </body>
 </html>
-
